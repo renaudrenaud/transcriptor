@@ -25,7 +25,6 @@
       width: 100%;
       max-width: 640px;
     }
-
     header h1 { font-size: 1.8rem; font-weight: 700; }
     header p  { color: #666; margin-top: .4rem; }
     header .version { color: #aaa; font-size: .8rem; margin-top: .25rem; }
@@ -49,11 +48,7 @@
       cursor: pointer;
       transition: all .15s;
     }
-    .lang-switch button.active {
-      background: #4f6ef7;
-      color: #fff;
-      border-color: #4f6ef7;
-    }
+    .lang-switch button.active { background: #4f6ef7; color: #fff; border-color: #4f6ef7; }
     .lang-switch button:hover:not(.active) { color: #4f6ef7; border-color: #4f6ef7; }
 
     footer {
@@ -85,30 +80,16 @@
       cursor: pointer;
       transition: border-color .2s, background .2s;
     }
-    .drop-zone:hover, .drop-zone.drag-over {
-      border-color: #4f6ef7;
-      background: #f0f3ff;
-    }
-    .drop-zone.has-file {
-      border-color: #22c55e;
-      background: #f0fdf4;
-    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #4f6ef7; background: #f0f3ff; }
+    .drop-zone.has-file { border-color: #22c55e; background: #f0fdf4; }
     .drop-zone input { display: none; }
     .drop-zone .icon { font-size: 2rem; margin-bottom: .5rem; }
     .drop-zone .label { color: #555; font-size: .95rem; }
     .drop-zone .filename { color: #16a34a; font-weight: 600; margin-top: .4rem; font-size: .9rem; }
 
-    .controls {
-      display: flex;
-      gap: 1rem;
-      align-items: flex-end;
-    }
+    .controls { display: flex; gap: 1rem; align-items: flex-end; }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: .3rem;
-    }
+    .field { display: flex; flex-direction: column; gap: .3rem; }
     .field label { font-size: .85rem; font-weight: 600; color: #444; }
     .field select {
       padding: .5rem .75rem;
@@ -133,12 +114,7 @@
     button:hover:not(:disabled) { background: #3b55d4; }
     button:disabled { background: #a0a0a0; cursor: not-allowed; }
 
-    .status {
-      font-size: .9rem;
-      color: #555;
-      min-height: 1.2rem;
-      text-align: center;
-    }
+    .status { font-size: .9rem; color: #555; min-height: 1.2rem; text-align: center; }
     .status.error { color: #dc2626; }
 
     .result-block { display: none; flex-direction: column; gap: .75rem; }
@@ -146,7 +122,6 @@
 
     textarea {
       width: 100%;
-      min-height: 200px;
       padding: .75rem;
       border: 1px solid #ddd;
       border-radius: 6px;
@@ -164,6 +139,39 @@
       border: 1.5px solid #4f6ef7;
     }
     .btn-secondary:hover:not(:disabled) { background: #f0f3ff; }
+
+    /* LLM section */
+    .divider { border: none; border-top: 1px solid #eee; margin: .25rem 0; }
+
+    .section-title {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #aaa;
+    }
+
+    .llm-block { display: none; flex-direction: column; gap: 1.25rem; }
+    .llm-block.visible { display: flex; }
+
+    .prompt-area {
+      min-height: 160px;
+      font-size: .82rem;
+      font-family: 'Courier New', monospace;
+      background: #fafafa;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .report-area {
+      min-height: 320px;
+      font-size: .85rem;
+      font-family: 'Courier New', monospace;
+      background: #fafafa;
+      line-height: 1.6;
+    }
+
+    .ollama-info { font-size: .75rem; color: #bbb; text-align: right; }
   </style>
 </head>
 <body>
@@ -180,6 +188,7 @@
 
 <div class="card">
 
+  <!-- Drop zone -->
   <div class="drop-zone" id="dropZone">
     <input type="file" id="fileInput" accept=".mp3,audio/mpeg">
     <div class="icon">🎙️</div>
@@ -187,10 +196,11 @@
     <div class="filename" id="filename"></div>
   </div>
 
+  <!-- Transcription controls -->
   <div class="controls">
     <div class="field">
-      <label for="lang" id="langLabel"></label>
-      <select id="lang">
+      <label for="audioLang" id="langLabel"></label>
+      <select id="audioLang">
         <option value="fr" id="optFr"></option>
         <option value="en" id="optEn"></option>
         <option value="auto" id="optAuto"></option>
@@ -201,12 +211,60 @@
 
   <div class="status" id="status"></div>
 
+  <!-- Transcription result -->
   <div class="result-block" id="resultBlock">
-    <textarea id="result" readonly></textarea>
+    <textarea id="result" readonly style="min-height:200px"></textarea>
     <div class="result-actions">
       <button class="btn-secondary" id="copyBtn"></button>
-      <button class="btn-secondary" id="downloadBtn"></button>
+      <button class="btn-secondary" id="downloadTxtBtn"></button>
     </div>
+  </div>
+
+  <!-- LLM section -->
+  <div class="llm-block" id="llmBlock">
+    <hr class="divider">
+    <div class="section-title" id="llmSectionTitle"></div>
+
+    <!-- Report type -->
+    <div class="field">
+      <label for="reportType" id="reportTypeLabel"></label>
+      <select id="reportType">
+        <option value="resume"      id="typeResume"></option>
+        <option value="compte-rendu" id="typeReport"></option>
+        <option value="pv" selected  id="typePV"></option>
+        <option value="free"         id="typeFree"></option>
+      </select>
+    </div>
+
+    <!-- Prompt -->
+    <div class="field">
+      <label for="promptArea" id="promptLabel"></label>
+      <textarea class="prompt-area" id="promptArea" spellcheck="false"></textarea>
+    </div>
+
+    <!-- Model + generate -->
+    <div class="controls">
+      <div class="field" style="flex:1">
+        <label for="modelSelect" id="modelLabel"></label>
+        <select id="modelSelect">
+          <option id="modelLoading"></option>
+        </select>
+      </div>
+      <button id="generateBtn" style="flex:none; white-space:nowrap"></button>
+    </div>
+
+    <div class="status" id="llmStatus"></div>
+
+    <!-- Report result -->
+    <div class="result-block" id="reportBlock">
+      <textarea class="report-area" id="report" readonly></textarea>
+      <div class="result-actions">
+        <button class="btn-secondary" id="copyReportBtn"></button>
+        <button class="btn-secondary" id="downloadMdBtn"></button>
+      </div>
+    </div>
+
+    <div class="ollama-info" id="ollamaInfo"></div>
   </div>
 
 </div>
@@ -218,43 +276,95 @@
 <script>
   const i18n = {
     fr: {
-      subtitle:     'Transcription audio locale — confidentielle & rapide',
-      dropLabel:    'Glissez un fichier <strong>MP3</strong> ici ou <strong>cliquez pour parcourir</strong>',
-      langLabel:    'Langue',
-      optFr:        'Français',
-      optEn:        'English',
-      optAuto:      'Auto-détection',
-      transcribe:   'Transcrire',
-      inProgress:   'Transcription en cours… (environ 2 min pour 1h d\'audio)',
-      done:         'Transcription terminée.',
-      copy:         'Copier',
-      copied:       'Copié !',
-      download:     'Télécharger .txt',
-      errFormat:    'Format non supporté — seuls les fichiers MP3 sont acceptés.',
-      errTimeout:   'Délai dépassé — le fichier est trop long pour être traité dans le temps imparti. Contactez l\'administrateur pour augmenter le timeout.',
-      errServer:    'Erreur serveur',
+      subtitle:         'Transcription audio locale — confidentielle & rapide',
+      dropLabel:        'Glissez un fichier <strong>MP3</strong> ici ou <strong>cliquez pour parcourir</strong>',
+      langLabel:        'Langue audio',
+      optFr:            'Français',
+      optEn:            'English',
+      optAuto:          'Auto-détection',
+      transcribe:       'Transcrire',
+      inProgress:       'Transcription en cours… (environ 2 min pour 1h d\'audio)',
+      done:             'Transcription terminée.',
+      copy:             'Copier',
+      copied:           'Copié !',
+      downloadTxt:      'Télécharger .txt',
+      llmSection:       'Compte rendu',
+      reportTypeLabel:  'Type de rapport',
+      typeResume:       'Résumé',
+      typeReport:       'Compte rendu',
+      typePV:           'Procès-verbal',
+      typeFree:         'Libre',
+      promptLabel:      'Prompt',
+      promptPlaceholder:'Saisissez votre prompt… Utilisez {{transcription}} pour insérer le texte.',
+      modelLabel:       'Modèle Ollama',
+      modelLoading:     'Chargement des modèles…',
+      modelError:       'Impossible de contacter Ollama',
+      generate:         'Générer',
+      generating:       'Génération en cours…',
+      generatedDone:    'Compte rendu généré.',
+      copyReport:       'Copier',
+      copiedReport:     'Copié !',
+      downloadMd:       'Télécharger .md',
+      errFormat:        'Format non supporté — seuls les fichiers MP3 sont acceptés.',
+      errTimeout:       'Délai dépassé — le fichier est trop long. Contactez l\'administrateur pour augmenter le timeout.',
+      errServer:        'Erreur serveur',
+      errOllama:        'Impossible de contacter Ollama. Vérifiez l\'URL dans config.json et que CORS est activé (OLLAMA_ORIGINS=*).',
     },
     en: {
-      subtitle:     'Local audio transcription — private & fast',
-      dropLabel:    'Drop an <strong>MP3</strong> file here or <strong>click to browse</strong>',
-      langLabel:    'Language',
-      optFr:        'French',
-      optEn:        'English',
-      optAuto:      'Auto-detect',
-      transcribe:   'Transcribe',
-      inProgress:   'Transcribing… (approx. 2 min per hour of audio)',
-      done:         'Transcription complete.',
-      copy:         'Copy',
-      copied:       'Copied!',
-      download:     'Download .txt',
-      errFormat:    'Unsupported format — only MP3 files are accepted.',
-      errTimeout:   'Request timed out — the file is too long to process within the configured limit. Ask your administrator to increase the timeout.',
-      errServer:    'Server error',
+      subtitle:         'Local audio transcription — private & fast',
+      dropLabel:        'Drop an <strong>MP3</strong> file here or <strong>click to browse</strong>',
+      langLabel:        'Audio language',
+      optFr:            'French',
+      optEn:            'English',
+      optAuto:          'Auto-detect',
+      transcribe:       'Transcribe',
+      inProgress:       'Transcribing… (approx. 2 min per hour of audio)',
+      done:             'Transcription complete.',
+      copy:             'Copy',
+      copied:           'Copied!',
+      downloadTxt:      'Download .txt',
+      llmSection:       'Meeting report',
+      reportTypeLabel:  'Report type',
+      typeResume:       'Summary',
+      typeReport:       'Report',
+      typePV:           'Minutes',
+      typeFree:         'Free',
+      promptLabel:      'Prompt',
+      promptPlaceholder:'Enter your prompt… Use {{transcription}} to insert the text.',
+      modelLabel:       'Ollama model',
+      modelLoading:     'Loading models…',
+      modelError:       'Unable to reach Ollama',
+      generate:         'Generate',
+      generating:       'Generating…',
+      generatedDone:    'Report generated.',
+      copyReport:       'Copy',
+      copiedReport:     'Copied!',
+      downloadMd:       'Download .md',
+      errFormat:        'Unsupported format — only MP3 files are accepted.',
+      errTimeout:       'Request timed out — file too long. Ask your administrator to increase the timeout.',
+      errServer:        'Server error',
+      errOllama:        'Unable to reach Ollama. Check the URL in config.json and that CORS is enabled (OLLAMA_ORIGINS=*).',
     }
   };
 
-  let locale = localStorage.getItem('locale') || 'fr';
+  let locale     = localStorage.getItem('locale') || 'fr';
+  let ollamaHost = 'http://localhost:11434';
+  let prompts    = {};
   let selectedFile = null;
+
+  // Load config + prompts + version in parallel
+  Promise.all([
+    fetch('/config.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    fetch('/prompts.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    fetch('/VERSION').then(r => r.ok ? r.text() : null).catch(() => null),
+  ]).then(([cfg, prs, ver]) => {
+    if (cfg.ollamaHost) ollamaHost = cfg.ollamaHost.replace(/\/$/, '');
+    document.getElementById('ollamaInfo').textContent = ollamaHost;
+    prompts = prs;
+    if (ver) document.getElementById('version').textContent = 'v' + ver.trim();
+    // Set default prompt (pv)
+    setReportType(document.getElementById('reportType').value);
+  });
 
   function setLang(l) {
     locale = l;
@@ -263,35 +373,98 @@
     document.getElementById('btnFr').classList.toggle('active', l === 'fr');
     document.getElementById('btnEn').classList.toggle('active', l === 'en');
     const t = i18n[l];
-    document.getElementById('subtitle').innerHTML   = t.subtitle;
-    document.getElementById('dropLabel').innerHTML  = t.dropLabel;
-    document.getElementById('langLabel').textContent = t.langLabel;
-    document.getElementById('optFr').textContent    = t.optFr;
-    document.getElementById('optEn').textContent    = t.optEn;
-    document.getElementById('optAuto').textContent  = t.optAuto;
-    document.getElementById('transcribeBtn').textContent = t.transcribe;
-    document.getElementById('copyBtn').textContent  = t.copy;
-    document.getElementById('downloadBtn').textContent   = t.download;
+    document.getElementById('subtitle').innerHTML         = t.subtitle;
+    document.getElementById('dropLabel').innerHTML        = t.dropLabel;
+    document.getElementById('langLabel').textContent      = t.langLabel;
+    document.getElementById('optFr').textContent          = t.optFr;
+    document.getElementById('optEn').textContent          = t.optEn;
+    document.getElementById('optAuto').textContent        = t.optAuto;
+    document.getElementById('transcribeBtn').textContent  = t.transcribe;
+    document.getElementById('copyBtn').textContent        = t.copy;
+    document.getElementById('downloadTxtBtn').textContent = t.downloadTxt;
+    document.getElementById('llmSectionTitle').textContent = t.llmSection;
+    document.getElementById('reportTypeLabel').textContent = t.reportTypeLabel;
+    document.getElementById('typeResume').textContent     = t.typeResume;
+    document.getElementById('typeReport').textContent     = t.typeReport;
+    document.getElementById('typePV').textContent         = t.typePV;
+    document.getElementById('typeFree').textContent       = t.typeFree;
+    document.getElementById('promptLabel').textContent    = t.promptLabel;
+    document.getElementById('promptArea').placeholder     = t.promptPlaceholder;
+    document.getElementById('modelLabel').textContent     = t.modelLabel;
+    document.getElementById('generateBtn').textContent    = t.generate;
+    document.getElementById('copyReportBtn').textContent  = t.copyReport;
+    document.getElementById('downloadMdBtn').textContent  = t.downloadMd;
+    // Reload prompt in new language (except free — user-written)
+    const currentType = document.getElementById('reportType').value;
+    if (currentType !== 'free') setReportType(currentType);
   }
 
-  // Version
-  fetch('/VERSION').then(r => r.ok ? r.text() : null).then(v => {
-    if (v) document.getElementById('version').textContent = 'v' + v.trim();
-  }).catch(() => {});
+  function setReportType(type) {
+    const promptArea = document.getElementById('promptArea');
+    if (type === 'free') {
+      promptArea.readOnly = false;
+      promptArea.value = localStorage.getItem('transcriptor_free_prompt') || '';
+      promptArea.style.borderColor = '#f59e0b';
+    } else {
+      promptArea.readOnly = false;
+      promptArea.value = (prompts[type] && prompts[type][locale]) || prompts[type] || '';
+      promptArea.style.borderColor = '';
+    }
+  }
 
-  // Init
+  document.getElementById('reportType').addEventListener('change', e => {
+    setReportType(e.target.value);
+  });
+
+  // Save free prompt on edit
+  document.getElementById('promptArea').addEventListener('input', () => {
+    if (document.getElementById('reportType').value === 'free') {
+      localStorage.setItem('transcriptor_free_prompt', document.getElementById('promptArea').value);
+    }
+  });
+
   setLang(locale);
 
-  const dropZone      = document.getElementById('dropZone');
-  const fileInput     = document.getElementById('fileInput');
-  const filenameEl    = document.getElementById('filename');
-  const transcribeBtn = document.getElementById('transcribeBtn');
-  const langSelect    = document.getElementById('lang');
-  const statusEl      = document.getElementById('status');
-  const resultBlock   = document.getElementById('resultBlock');
-  const resultEl      = document.getElementById('result');
-  const copyBtn       = document.getElementById('copyBtn');
-  const downloadBtn   = document.getElementById('downloadBtn');
+  // Load Ollama models
+  async function loadModels() {
+    const sel = document.getElementById('modelSelect');
+    sel.innerHTML = `<option>${i18n[locale].modelLoading}</option>`;
+    try {
+      const res = await fetch(`${ollamaHost}/api/tags`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      sel.innerHTML = '';
+      (data.models || []).forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        opt.textContent = m.name;
+        if (m.name.startsWith('gpt-oos')) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      if (!sel.options.length) throw new Error();
+    } catch {
+      sel.innerHTML = `<option disabled>${i18n[locale].modelError}</option>`;
+    }
+  }
+
+  // DOM refs
+  const dropZone       = document.getElementById('dropZone');
+  const fileInput      = document.getElementById('fileInput');
+  const filenameEl     = document.getElementById('filename');
+  const transcribeBtn  = document.getElementById('transcribeBtn');
+  const audioLangSel   = document.getElementById('audioLang');
+  const statusEl       = document.getElementById('status');
+  const resultBlock    = document.getElementById('resultBlock');
+  const resultEl       = document.getElementById('result');
+  const copyBtn        = document.getElementById('copyBtn');
+  const downloadTxtBtn = document.getElementById('downloadTxtBtn');
+  const llmBlock       = document.getElementById('llmBlock');
+  const generateBtn    = document.getElementById('generateBtn');
+  const llmStatus      = document.getElementById('llmStatus');
+  const reportBlock    = document.getElementById('reportBlock');
+  const reportEl       = document.getElementById('report');
+  const copyReportBtn  = document.getElementById('copyReportBtn');
+  const downloadMdBtn  = document.getElementById('downloadMdBtn');
 
   dropZone.addEventListener('click', () => fileInput.click());
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -299,13 +472,9 @@
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file) setFile(file);
+    if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
   });
-
-  fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) setFile(fileInput.files[0]);
-  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
 
   function setFile(file) {
     if (!file.name.toLowerCase().endsWith('.mp3') && file.type !== 'audio/mpeg') {
@@ -320,34 +489,38 @@
     statusEl.textContent = '';
     statusEl.className = 'status';
     resultBlock.classList.remove('visible');
+    llmBlock.classList.remove('visible');
   }
 
+  // Transcription
   transcribeBtn.addEventListener('click', async () => {
     if (!selectedFile) return;
-
     transcribeBtn.disabled = true;
     statusEl.className = 'status';
     statusEl.textContent = i18n[locale].inProgress;
     resultBlock.classList.remove('visible');
+    llmBlock.classList.remove('visible');
 
     const formData = new FormData();
     formData.append('file', selectedFile, selectedFile.name);
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'text');
-
-    const lang = langSelect.value;
+    const lang = audioLangSel.value;
     if (lang !== 'auto') formData.append('language', lang);
 
     try {
       const res = await fetch('/api/v1/audio/transcriptions', { method: 'POST', body: formData });
-
       if (res.status === 504) throw new Error(i18n[locale].errTimeout);
       if (!res.ok) throw new Error(`${i18n[locale].errServer} : ${res.status} ${res.statusText}`);
-
       const text = await res.text();
       resultEl.value = text.trim();
       resultBlock.classList.add('visible');
       statusEl.textContent = i18n[locale].done;
+      llmBlock.classList.add('visible');
+      reportBlock.classList.remove('visible');
+      llmStatus.textContent = '';
+      llmStatus.className = 'status';
+      await loadModels();
     } catch (err) {
       statusEl.className = 'status error';
       statusEl.textContent = err.message;
@@ -362,14 +535,88 @@
     setTimeout(() => copyBtn.textContent = i18n[locale].copy, 2000);
   });
 
-  downloadBtn.addEventListener('click', () => {
-    const basename = selectedFile ? selectedFile.name.replace(/\.[^.]+$/, '') : 'transcription';
-    const blob = new Blob([resultEl.value], { type: 'text/plain' });
+  downloadTxtBtn.addEventListener('click', () => {
+    const name = selectedFile ? selectedFile.name.replace(/\.[^.]+$/, '') : 'transcription';
+    download(resultEl.value, name + '.txt', 'text/plain');
+  });
+
+  // Generate report
+  generateBtn.addEventListener('click', async () => {
+    const model      = document.getElementById('modelSelect').value;
+    const promptTpl  = document.getElementById('promptArea').value;
+    const transcript = resultEl.value;
+    if (!model || !transcript || !promptTpl) return;
+
+    const prompt = promptTpl.replace('{{transcription}}', transcript);
+
+    generateBtn.disabled = true;
+    llmStatus.className = 'status';
+    llmStatus.textContent = i18n[locale].generating;
+    reportEl.value = '';
+    reportBlock.classList.remove('visible');
+
+    try {
+      const res = await fetch(`${ollamaHost}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, prompt, stream: true }),
+      });
+
+      if (!res.ok) throw new Error(`${i18n[locale].errServer} : ${res.status}`);
+
+      reportBlock.classList.add('visible');
+      const reader  = res.body.getReader();
+      const decoder = new TextDecoder();
+      let report = '';
+      let buf    = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop();
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const obj = JSON.parse(line);
+            if (obj.response) {
+              report += obj.response;
+              reportEl.value = report;
+              reportEl.scrollTop = reportEl.scrollHeight;
+            }
+          } catch {}
+        }
+      }
+      llmStatus.textContent = i18n[locale].generatedDone;
+    } catch (err) {
+      llmStatus.className = 'status error';
+      llmStatus.textContent = err.message.includes('fetch') ? i18n[locale].errOllama : err.message;
+    } finally {
+      generateBtn.disabled = false;
+    }
+  });
+
+  copyReportBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(reportEl.value);
+    copyReportBtn.textContent = i18n[locale].copiedReport;
+    setTimeout(() => copyReportBtn.textContent = i18n[locale].copyReport, 2000);
+  });
+
+  downloadMdBtn.addEventListener('click', () => {
+    const type = document.getElementById('reportType').value;
+    const suffix = type === 'resume' ? '-resume' : type === 'pv' ? '-pv' : type === 'free' ? '-free' : '-compte-rendu';
+    const name = selectedFile ? selectedFile.name.replace(/\.[^.]+$/, '') + suffix : 'rapport';
+    download(reportEl.value, name + '.md', 'text/markdown');
+  });
+
+  function download(content, filename, type) {
+    const blob = new Blob([content], { type });
     const url  = URL.createObjectURL(blob);
-    const a    = Object.assign(document.createElement('a'), { href: url, download: basename + '.txt' });
+    const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
     a.click();
     URL.revokeObjectURL(url);
-  });
+  }
 </script>
 
 </body>

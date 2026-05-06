@@ -1,0 +1,21 @@
+{
+  "resume": {
+    "fr": "Tu es un assistant de synthèse. À partir de la transcription ci-dessous, rédige un résumé exécutif en markdown, en une page maximum.\n\nStructure attendue :\n\n## Résumé\n(3 à 5 phrases résumant l'essentiel de la réunion)\n\n## Points clés\n(liste à puces, 5 points maximum)\n\n## Décisions\n(liste des décisions prises)\n\n## Actions\n| Action | Responsable | Échéance |\n|--------|-------------|----------|\n\n---\nTranscription :\n\n{{transcription}}",
+    "en": "You are a summarization assistant. From the transcription below, write an executive summary in markdown, one page maximum.\n\nExpected structure:\n\n## Summary\n(3 to 5 sentences summarizing the key points of the meeting)\n\n## Key points\n(bullet list, 5 points maximum)\n\n## Decisions\n(list of decisions made)\n\n## Actions\n| Action | Owner | Due date |\n|--------|-------|----------|\n\n---\nTranscription:\n\n{{transcription}}"
+  },
+
+  "compte-rendu": {
+    "fr": "Tu es un assistant spécialisé en rédaction de comptes rendus. À partir de la transcription ci-dessous, rédige un compte rendu structuré en markdown. Synthétise les échanges en conservant tous les points importants, sans retranscription verbatim.\n\nStructure attendue :\n\n# Compte rendu de réunion\n\n## Participants\n(liste des personnes identifiées)\n\n## Ordre du jour\n(points abordés, dans l'ordre chronologique)\n\n## Déroulement\n\n### [Sujet 1]\n(synthèse des échanges, positions, arguments)\n\n### [Sujet N]\n...\n\n## Décisions\n(chaque décision avec son contexte)\n\n## Actions\n| Action | Responsable | Échéance |\n|--------|-------------|----------|\n\n---\nTranscription :\n\n{{transcription}}",
+    "en": "You are an assistant specializing in writing meeting minutes. From the transcription below, write a structured report in markdown. Synthesize the exchanges while retaining all important points, without verbatim transcription.\n\nExpected structure:\n\n# Meeting Minutes\n\n## Participants\n(list of identified persons)\n\n## Agenda\n(points covered, in chronological order)\n\n## Discussion\n\n### [Topic 1]\n(synthesis of exchanges, positions, arguments)\n\n### [Topic N]\n...\n\n## Decisions\n(each decision with its context)\n\n## Actions\n| Action | Owner | Due date |\n|--------|-------|----------|\n\n---\nTranscription:\n\n{{transcription}}"
+  },
+
+  "pv": {
+    "fr": "Tu es un assistant spécialisé en rédaction de procès-verbaux. À partir de la transcription exacte ci-dessous, rédige un procès-verbal exhaustif et fidèle en markdown, sans résumer ni paraphraser. Retranscris fidèlement les échanges, positions et arguments. Si des noms ne sont pas identifiables, utilise \"Intervenant 1\", \"Intervenant 2\", etc.\n\nStructure attendue :\n\n# Procès-verbal de réunion\n\n## Participants\n(liste des personnes identifiées)\n\n## Ordre du jour\n(points abordés, dans l'ordre chronologique)\n\n## Déroulement\n\n### [Sujet 1]\n(retranscription fidèle des échanges, positions exprimées, arguments avancés)\n\n### [Sujet N]\n...\n\n## Décisions\n(formulation exacte de chaque décision prise, avec contexte)\n\n## Actions\n| Action | Responsable | Échéance |\n|--------|-------------|----------|\n\n## Observations\n(points de désaccord, réserves exprimées, questions non tranchées)\n\n---\nTranscription :\n\n{{transcription}}",
+    "en": "You are an assistant specializing in writing formal minutes of proceedings. From the exact transcription below, write exhaustive and faithful minutes in markdown, without summarizing or paraphrasing. Faithfully transcribe all exchanges, positions, and arguments. If names cannot be identified, use \"Speaker 1\", \"Speaker 2\", etc.\n\nExpected structure:\n\n# Minutes of Meeting\n\n## Participants\n(list of identified persons)\n\n## Agenda\n(points covered, in chronological order)\n\n## Proceedings\n\n### [Topic 1]\n(faithful transcription of exchanges, positions expressed, arguments made)\n\n### [Topic N]\n...\n\n## Decisions\n(exact wording of each decision made, with context)\n\n## Actions\n| Action | Owner | Due date |\n|--------|-------|----------|\n\n## Observations\n(points of disagreement, reservations expressed, unresolved questions)\n\n---\nTranscription:\n\n{{transcription}}"
+  },
+
+  "free": {
+    "fr": "",
+    "en": ""
+  }
+}

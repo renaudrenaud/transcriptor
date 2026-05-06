@@ -15,7 +15,7 @@ Interface de transcription partagée, accessible depuis n'importe quelle machine
 
 ---
 
-## Étape 2 — Intégration LLM (compte rendu)
+## ✅ Étape 2 — Intégration LLM (compte rendu, livré en v1.3.0)
 
 À partir du texte transcrit, appel à Ollama pour générer un compte rendu structuré.
 

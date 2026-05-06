@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.0] - 2026-05-07
+
+### Ajouté
+- Intégration LLM via Ollama — génération de compte rendu en streaming directement depuis l'interface web
+- Sélecteur de type de rapport : Résumé, Compte rendu, Procès-verbal, Libre (prompt éditable, mémorisé dans `localStorage`)
+- Prompts bilingues FR/EN dans `frontend/prompts.json` — changent automatiquement avec la langue de l'interface
+- Sélecteur de modèle Ollama — liste chargée dynamiquement depuis l'API Ollama
+- `frontend/config.json` — URL Ollama configurable (cible n'importe quelle machine du réseau)
+- Téléchargement du compte rendu en `.md` avec suffixe selon le type (-resume, -pv, -compte-rendu, -free)
+- Header `Cache-Control: no-store` sur HTML et JSON — plus besoin de hard refresh après mise à jour
+
+### Modifié
+- `frontend/nginx.conf` — ajout de la règle de cache
+
+---
+
 ## [1.2.0] - 2026-05-06
 
 ### Ajouté

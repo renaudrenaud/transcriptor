@@ -5,6 +5,12 @@
 ### Ajouté
 - `README_EN.md` — version anglaise du README
 - `runbooks_en/` — traduction anglaise des trois runbooks (install, recording, transcription)
+- `adr_en/` — traduction anglaise des ADRs
+- `ROADMAP.md` — frontend web envisagé
+- `Dockerfile` — patch de sécurité sur l'image upstream (ADR-004) : mise à jour ciblée de `libssl3t64`, `libgnutls30t64`, `libsystemd0`, `libudev1`, `libcap2`, `sed`
+
+### Modifié
+- `docker-compose.yml` — passage de `image:` à `build: .` pour appliquer le patch de sécurité
 
 ---
 

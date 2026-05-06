@@ -21,11 +21,40 @@
     header {
       text-align: center;
       margin-bottom: 2rem;
+      position: relative;
+      width: 100%;
+      max-width: 640px;
     }
 
     header h1 { font-size: 1.8rem; font-weight: 700; }
     header p  { color: #666; margin-top: .4rem; }
     header .version { color: #aaa; font-size: .8rem; margin-top: .25rem; }
+
+    .lang-switch {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      gap: .25rem;
+    }
+    .lang-switch button {
+      flex: none;
+      padding: .25rem .5rem;
+      font-size: .75rem;
+      font-weight: 600;
+      background: #fff;
+      color: #aaa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .lang-switch button.active {
+      background: #4f6ef7;
+      color: #fff;
+      border-color: #4f6ef7;
+    }
+    .lang-switch button:hover:not(.active) { color: #4f6ef7; border-color: #4f6ef7; }
 
     footer {
       margin-top: 2rem;
@@ -48,7 +77,6 @@
       gap: 1.25rem;
     }
 
-    /* Drop zone */
     .drop-zone {
       border: 2px dashed #ccc;
       border-radius: 8px;
@@ -70,7 +98,6 @@
     .drop-zone .label { color: #555; font-size: .95rem; }
     .drop-zone .filename { color: #16a34a; font-weight: 600; margin-top: .4rem; font-size: .9rem; }
 
-    /* Controls */
     .controls {
       display: flex;
       gap: 1rem;
@@ -106,7 +133,6 @@
     button:hover:not(:disabled) { background: #3b55d4; }
     button:disabled { background: #a0a0a0; cursor: not-allowed; }
 
-    /* Status */
     .status {
       font-size: .9rem;
       color: #555;
@@ -115,7 +141,6 @@
     }
     .status.error { color: #dc2626; }
 
-    /* Result */
     .result-block { display: none; flex-direction: column; gap: .75rem; }
     .result-block.visible { display: flex; }
 
@@ -131,10 +156,7 @@
       line-height: 1.5;
     }
 
-    .result-actions {
-      display: flex;
-      gap: .75rem;
-    }
+    .result-actions { display: flex; gap: .75rem; }
 
     .btn-secondary {
       background: #fff;
@@ -147,43 +169,43 @@
 <body>
 
 <header>
+  <div class="lang-switch">
+    <button id="btnFr" class="active" onclick="setLang('fr')">FR</button>
+    <button id="btnEn" onclick="setLang('en')">EN</button>
+  </div>
   <h1>Transcriptor</h1>
-  <p>Transcription audio locale — confidentielle &amp; rapide</p>
+  <p id="subtitle"></p>
   <div class="version" id="version"></div>
 </header>
 
 <div class="card">
 
-  <!-- Drop zone -->
   <div class="drop-zone" id="dropZone">
     <input type="file" id="fileInput" accept=".mp3,audio/mpeg">
     <div class="icon">🎙️</div>
-    <div class="label">Glissez un fichier <strong>MP3</strong> ici ou <strong>cliquez pour parcourir</strong></div>
+    <div class="label" id="dropLabel"></div>
     <div class="filename" id="filename"></div>
   </div>
 
-  <!-- Controls -->
   <div class="controls">
     <div class="field">
-      <label for="lang">Langue</label>
+      <label for="lang" id="langLabel"></label>
       <select id="lang">
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-        <option value="auto">Auto-détection</option>
+        <option value="fr" id="optFr"></option>
+        <option value="en" id="optEn"></option>
+        <option value="auto" id="optAuto"></option>
       </select>
     </div>
-    <button id="transcribeBtn" disabled>Transcrire</button>
+    <button id="transcribeBtn" disabled></button>
   </div>
 
-  <!-- Status -->
   <div class="status" id="status"></div>
 
-  <!-- Result -->
   <div class="result-block" id="resultBlock">
     <textarea id="result" readonly></textarea>
     <div class="result-actions">
-      <button class="btn-secondary" id="copyBtn">Copier</button>
-      <button class="btn-secondary" id="downloadBtn">Télécharger .txt</button>
+      <button class="btn-secondary" id="copyBtn"></button>
+      <button class="btn-secondary" id="downloadBtn"></button>
     </div>
   </div>
 
@@ -194,6 +216,72 @@
 </footer>
 
 <script>
+  const i18n = {
+    fr: {
+      subtitle:     'Transcription audio locale — confidentielle & rapide',
+      dropLabel:    'Glissez un fichier <strong>MP3</strong> ici ou <strong>cliquez pour parcourir</strong>',
+      langLabel:    'Langue',
+      optFr:        'Français',
+      optEn:        'English',
+      optAuto:      'Auto-détection',
+      transcribe:   'Transcrire',
+      inProgress:   'Transcription en cours… (environ 2 min pour 1h d\'audio)',
+      done:         'Transcription terminée.',
+      copy:         'Copier',
+      copied:       'Copié !',
+      download:     'Télécharger .txt',
+      errFormat:    'Format non supporté — seuls les fichiers MP3 sont acceptés.',
+      errTimeout:   'Délai dépassé — le fichier est trop long pour être traité dans le temps imparti. Contactez l\'administrateur pour augmenter le timeout.',
+      errServer:    'Erreur serveur',
+    },
+    en: {
+      subtitle:     'Local audio transcription — private & fast',
+      dropLabel:    'Drop an <strong>MP3</strong> file here or <strong>click to browse</strong>',
+      langLabel:    'Language',
+      optFr:        'French',
+      optEn:        'English',
+      optAuto:      'Auto-detect',
+      transcribe:   'Transcribe',
+      inProgress:   'Transcribing… (approx. 2 min per hour of audio)',
+      done:         'Transcription complete.',
+      copy:         'Copy',
+      copied:       'Copied!',
+      download:     'Download .txt',
+      errFormat:    'Unsupported format — only MP3 files are accepted.',
+      errTimeout:   'Request timed out — the file is too long to process within the configured limit. Ask your administrator to increase the timeout.',
+      errServer:    'Server error',
+    }
+  };
+
+  let locale = localStorage.getItem('locale') || 'fr';
+  let selectedFile = null;
+
+  function setLang(l) {
+    locale = l;
+    localStorage.setItem('locale', l);
+    document.documentElement.lang = l;
+    document.getElementById('btnFr').classList.toggle('active', l === 'fr');
+    document.getElementById('btnEn').classList.toggle('active', l === 'en');
+    const t = i18n[l];
+    document.getElementById('subtitle').innerHTML   = t.subtitle;
+    document.getElementById('dropLabel').innerHTML  = t.dropLabel;
+    document.getElementById('langLabel').textContent = t.langLabel;
+    document.getElementById('optFr').textContent    = t.optFr;
+    document.getElementById('optEn').textContent    = t.optEn;
+    document.getElementById('optAuto').textContent  = t.optAuto;
+    document.getElementById('transcribeBtn').textContent = t.transcribe;
+    document.getElementById('copyBtn').textContent  = t.copy;
+    document.getElementById('downloadBtn').textContent   = t.download;
+  }
+
+  // Version
+  fetch('/VERSION').then(r => r.ok ? r.text() : null).then(v => {
+    if (v) document.getElementById('version').textContent = 'v' + v.trim();
+  }).catch(() => {});
+
+  // Init
+  setLang(locale);
+
   const dropZone      = document.getElementById('dropZone');
   const fileInput     = document.getElementById('fileInput');
   const filenameEl    = document.getElementById('filename');
@@ -205,18 +293,7 @@
   const copyBtn       = document.getElementById('copyBtn');
   const downloadBtn   = document.getElementById('downloadBtn');
 
-  let selectedFile = null;
-
-  // Version
-  fetch('/VERSION').then(r => r.ok ? r.text() : null).then(v => {
-    if (v) document.getElementById('version').textContent = 'v' + v.trim();
-  }).catch(() => {});
-
-
-  // Drop zone — click
   dropZone.addEventListener('click', () => fileInput.click());
-
-  // Drop zone — drag events
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => {
@@ -226,7 +303,6 @@
     if (file) setFile(file);
   });
 
-  // File input
   fileInput.addEventListener('change', () => {
     if (fileInput.files[0]) setFile(fileInput.files[0]);
   });
@@ -234,7 +310,7 @@
   function setFile(file) {
     if (!file.name.toLowerCase().endsWith('.mp3') && file.type !== 'audio/mpeg') {
       statusEl.className = 'status error';
-      statusEl.textContent = 'Format non supporté — seuls les fichiers MP3 sont acceptés.';
+      statusEl.textContent = i18n[locale].errFormat;
       return;
     }
     selectedFile = file;
@@ -246,13 +322,12 @@
     resultBlock.classList.remove('visible');
   }
 
-  // Transcribe
   transcribeBtn.addEventListener('click', async () => {
     if (!selectedFile) return;
 
     transcribeBtn.disabled = true;
     statusEl.className = 'status';
-    statusEl.textContent = 'Transcription en cours… (jusqu\'à 2 min pour 1h d\'audio)';
+    statusEl.textContent = i18n[locale].inProgress;
     resultBlock.classList.remove('visible');
 
     const formData = new FormData();
@@ -264,22 +339,15 @@
     if (lang !== 'auto') formData.append('language', lang);
 
     try {
-      const res = await fetch('/api/v1/audio/transcriptions', {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await fetch('/api/v1/audio/transcriptions', { method: 'POST', body: formData });
 
-      if (res.status === 504) {
-        throw new Error('Délai dépassé — le fichier est trop long pour être traité dans le temps imparti. Contactez l\'administrateur pour augmenter le timeout.');
-      }
-      if (!res.ok) {
-        throw new Error(`Erreur serveur : ${res.status} ${res.statusText}`);
-      }
+      if (res.status === 504) throw new Error(i18n[locale].errTimeout);
+      if (!res.ok) throw new Error(`${i18n[locale].errServer} : ${res.status} ${res.statusText}`);
 
       const text = await res.text();
       resultEl.value = text.trim();
       resultBlock.classList.add('visible');
-      statusEl.textContent = 'Transcription terminée.';
+      statusEl.textContent = i18n[locale].done;
     } catch (err) {
       statusEl.className = 'status error';
       statusEl.textContent = err.message;
@@ -288,18 +356,14 @@
     }
   });
 
-  // Copy
   copyBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(resultEl.value);
-    copyBtn.textContent = 'Copié !';
-    setTimeout(() => copyBtn.textContent = 'Copier', 2000);
+    copyBtn.textContent = i18n[locale].copied;
+    setTimeout(() => copyBtn.textContent = i18n[locale].copy, 2000);
   });
 
-  // Download
   downloadBtn.addEventListener('click', () => {
-    const basename = selectedFile
-      ? selectedFile.name.replace(/\.[^.]+$/, '')
-      : 'transcription';
+    const basename = selectedFile ? selectedFile.name.replace(/\.[^.]+$/, '') : 'transcription';
     const blob = new Blob([resultEl.value], { type: 'text/plain' });
     const url  = URL.createObjectURL(blob);
     const a    = Object.assign(document.createElement('a'), { href: url, download: basename + '.txt' });

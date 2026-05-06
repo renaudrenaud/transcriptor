@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-05-06
+
+### Ajouté
+- Interface web bilingue FR/EN — bouton de bascule en haut à droite, choix mémorisé dans `localStorage`
+
+---
+
 ## [1.1.0] - 2026-05-06
 
 ### Ajouté

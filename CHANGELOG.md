@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Ajouté
+- `README_EN.md` — version anglaise du README
+- `runbooks_en/` — traduction anglaise des trois runbooks (install, recording, transcription)
+
+---
+
 ## [1.0.0] - 2026-04-28
 
 ### Ajouté

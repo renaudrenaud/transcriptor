@@ -33,9 +33,15 @@ On machines equipped with an **AMD AI 395 (Strix Halo)** — such as the GMKTec 
 
 ## Runbooks
 
-- [Installation](runbooks/install.md) — prerequisites, image pull, startup, troubleshooting
-- [Recording](runbooks/enregistrement.md) — capturing a meeting (microphone + remote speakers)
-- [Transcription](runbooks/transcription.md) — transcribing an audio file
+- [Installation](runbooks_en/install.md) — prerequisites, image pull, startup, troubleshooting
+- [Recording](runbooks_en/recording.md) — capturing a meeting (microphone + remote speakers)
+- [Transcription](runbooks_en/transcription.md) — transcribing an audio file
+
+## Architecture decisions
+
+- [ADR-001 — Use of whisper.cpp](adr_en/001-whisper-cpp.md)
+- [ADR-002 — GPU Backend: Vulkan](adr_en/002-vulkan-backend.md)
+- [ADR-003 — Pre-built image instead of build from source](adr_en/003-prebuilt-image.md)
 
 ## Structure
 
@@ -47,8 +53,16 @@ transcriptor/
 │   ├── 001-whisper-cpp.md
 │   ├── 002-vulkan-backend.md
 │   └── 003-image-pre-compilee.md
-└── runbooks/
+├── adr_en/
+│   ├── 001-whisper-cpp.md
+│   ├── 002-vulkan-backend.md
+│   └── 003-prebuilt-image.md
+├── runbooks/
+│   ├── install.md
+│   ├── enregistrement.md
+│   └── transcription.md
+└── runbooks_en/
     ├── install.md
-    ├── enregistrement.md
+    ├── recording.md
     └── transcription.md
 ```

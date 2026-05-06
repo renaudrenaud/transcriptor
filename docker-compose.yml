@@ -1,7 +1,6 @@
 services:
   whisper:
-    build: .
-    image: whisper-server-vulkan:local
+    image: ghcr.io/kth8/whisper-server-vulkan:${WHISPER_IMAGE_TAG:-latest}
     init: true
     devices:
       - /dev/kfd

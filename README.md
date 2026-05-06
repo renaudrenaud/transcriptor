@@ -1,5 +1,7 @@
 # transcriptor
 
+[English version](README_EN.md)
+
 Transformez vos enregistrements audio en texte, **localement**, **rapidement**, **en toute confidentialité**.
 
 Transcriptor exploite la puissance GPU des machines **AMD Strix Halo** (GMKTec EVO2, Asus ROG Flow Z13 2025…) pour transcrire une heure d'enregistrement en moins de deux minutes — sans envoyer une seule donnée dans le cloud. Le texte produit peut ensuite être soumis à un LLM pour générer un compte rendu, extraire des décisions, ou produire tout autre document structuré.

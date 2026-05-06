@@ -18,6 +18,8 @@ Audio recording  →  Transcription (Transcriptor)  →  LLM  →  Meeting notes
    meeting.mp3            meeting.txt                         notes.md
 ```
 
+![Transcriptor web interface](docs/images/main.png)
+
 ## Quick start
 
 ```bash

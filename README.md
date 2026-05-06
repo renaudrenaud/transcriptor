@@ -20,6 +20,8 @@ Enregistrement audio  →  Transcription (Transcriptor)  →  LLM  →  Compte r
      meeting.mp3              meeting.txt                          compte_rendu.md
 ```
 
+![Interface web Transcriptor](docs/images/main.png)
+
 ## Démarrage rapide
 
 ```bash

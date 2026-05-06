@@ -8,7 +8,7 @@ Transcriptor exploite la puissance GPU des machines **AMD Strix Halo** (GMKTec E
 
 ## Pourquoi Transcriptor ?
 
-- **Confidentialité totale** : l'audio ne quitte jamais la machine. Idéal pour les réunions sensibles.
+- **Confidentialité totale** : l'audio ne quitte jamais la machine. Les fichiers sont traités en mémoire dans le container — aucune trace ne reste côté serveur après la transcription. Idéal pour les réunions sensibles.
 - **Rapide** : ~2 minutes pour 1 heure d'audio sur les machines Strix Halo de notre parc.
 - **Simple** : une commande pour démarrer, une commande pour transcrire.
 - **Flexible** : l'API compatible OpenAI Whisper permet l'intégration dans n'importe quel pipeline de traitement.
@@ -24,8 +24,10 @@ Enregistrement audio  →  Transcription (Transcriptor)  →  LLM  →  Compte r
 
 ```bash
 docker compose up -d
-./transcribe.sh ~/Téléchargements/meeting.mp3
 ```
+
+- **Interface web** : `http://localhost:8765`
+- **CLI** : `./transcribe.sh ~/Téléchargements/meeting.mp3`
 
 Voir les [runbooks](#runbooks) pour l'installation complète et les options avancées.
 
@@ -36,8 +38,9 @@ Sur les machines équipées d'un **AMD AI 395 (Strix Halo)** — comme le GMKTec
 ## Runbooks
 
 - [Installation](runbooks/install.md) — prérequis, pull de l'image, démarrage, dépannage
+- [Interface web](runbooks/webui.md) — accès depuis le réseau local (port 8765), utilisation, dépannage
 - [Enregistrement](runbooks/enregistrement.md) — capturer un meeting (micro + interlocuteurs)
-- [Transcription](runbooks/transcription.md) — transcrire un fichier audio
+- [Transcription](runbooks/transcription.md) — transcrire un fichier audio (CLI)
 
 ## Structure
 

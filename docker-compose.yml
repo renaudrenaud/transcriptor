@@ -8,8 +8,18 @@ services:
     read_only: true
     tmpfs:
       - /root/.cache/mesa_shader_cache
-    ports:
-      - "8080:8080"
     volumes:
       - ~/models:/models:ro
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "8765:80"
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./VERSION:/var/www/version/VERSION:ro
+    depends_on:
+      - whisper
     restart: unless-stopped

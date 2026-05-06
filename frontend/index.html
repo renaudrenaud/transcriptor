@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transcriptor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 { font-size: 1.8rem; font-weight: 700; }
+    header p  { color: #666; margin-top: .4rem; }
+    header .version { color: #aaa; font-size: .8rem; margin-top: .25rem; }
+
+    footer {
+      margin-top: 2rem;
+      font-size: .8rem;
+      color: #aaa;
+      text-align: center;
+    }
+    footer a { color: #4f6ef7; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      padding: 2rem;
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #4f6ef7;
+      background: #f0f3ff;
+    }
+    .drop-zone.has-file {
+      border-color: #22c55e;
+      background: #f0fdf4;
+    }
+    .drop-zone input { display: none; }
+    .drop-zone .icon { font-size: 2rem; margin-bottom: .5rem; }
+    .drop-zone .label { color: #555; font-size: .95rem; }
+    .drop-zone .filename { color: #16a34a; font-weight: 600; margin-top: .4rem; font-size: .9rem; }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+    }
+    .field label { font-size: .85rem; font-weight: 600; color: #444; }
+    .field select {
+      padding: .5rem .75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: .95rem;
+      background: #fff;
+    }
+
+    button {
+      flex: 1;
+      padding: .65rem 1.5rem;
+      background: #4f6ef7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    button:hover:not(:disabled) { background: #3b55d4; }
+    button:disabled { background: #a0a0a0; cursor: not-allowed; }
+
+    /* Status */
+    .status {
+      font-size: .9rem;
+      color: #555;
+      min-height: 1.2rem;
+      text-align: center;
+    }
+    .status.error { color: #dc2626; }
+
+    /* Result */
+    .result-block { display: none; flex-direction: column; gap: .75rem; }
+    .result-block.visible { display: flex; }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: .75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: .9rem;
+      font-family: inherit;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: .75rem;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: #4f6ef7;
+      border: 1.5px solid #4f6ef7;
+    }
+    .btn-secondary:hover:not(:disabled) { background: #f0f3ff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Transcriptor</h1>
+  <p>Transcription audio locale — confidentielle &amp; rapide</p>
+  <div class="version" id="version"></div>
+</header>
+
+<div class="card">
+
+  <!-- Drop zone -->
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="audio/*,video/*">
+    <div class="icon">🎙️</div>
+    <div class="label">Glissez un fichier audio ici ou <strong>cliquez pour parcourir</strong></div>
+    <div class="filename" id="filename"></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="field">
+      <label for="lang">Langue</label>
+      <select id="lang">
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+        <option value="auto">Auto-détection</option>
+      </select>
+    </div>
+    <button id="transcribeBtn" disabled>Transcrire</button>
+  </div>
+
+  <!-- Status -->
+  <div class="status" id="status"></div>
+
+  <!-- Result -->
+  <div class="result-block" id="resultBlock">
+    <textarea id="result" readonly></textarea>
+    <div class="result-actions">
+      <button class="btn-secondary" id="copyBtn">Copier</button>
+      <button class="btn-secondary" id="downloadBtn">Télécharger .txt</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="https://github.com/renaudrenaud/transcriptor" target="_blank" rel="noopener">github.com/renaudrenaud/transcriptor</a>
+</footer>
+
+<script>
+  const dropZone      = document.getElementById('dropZone');
+  const fileInput     = document.getElementById('fileInput');
+  const filenameEl    = document.getElementById('filename');
+  const transcribeBtn = document.getElementById('transcribeBtn');
+  const langSelect    = document.getElementById('lang');
+  const statusEl      = document.getElementById('status');
+  const resultBlock   = document.getElementById('resultBlock');
+  const resultEl      = document.getElementById('result');
+  const copyBtn       = document.getElementById('copyBtn');
+  const downloadBtn   = document.getElementById('downloadBtn');
+
+  let selectedFile = null;
+
+  // Version
+  fetch('/VERSION').then(r => r.ok ? r.text() : null).then(v => {
+    if (v) document.getElementById('version').textContent = 'v' + v.trim();
+  }).catch(() => {});
+
+
+  // Drop zone — click
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  // Drop zone — drag events
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) setFile(file);
+  });
+
+  // File input
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+
+  function setFile(file) {
+    selectedFile = file;
+    filenameEl.textContent = file.name;
+    dropZone.classList.add('has-file');
+    transcribeBtn.disabled = false;
+    statusEl.textContent = '';
+    statusEl.className = 'status';
+    resultBlock.classList.remove('visible');
+  }
+
+  // Transcribe
+  transcribeBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+
+    transcribeBtn.disabled = true;
+    statusEl.className = 'status';
+    statusEl.textContent = 'Transcription en cours… (jusqu\'à 2 min pour 1h d\'audio)';
+    resultBlock.classList.remove('visible');
+
+    const formData = new FormData();
+    formData.append('file', selectedFile, selectedFile.name);
+    formData.append('model', 'whisper-1');
+    formData.append('response_format', 'text');
+
+    const lang = langSelect.value;
+    if (lang !== 'auto') formData.append('language', lang);
+
+    try {
+      const res = await fetch('/api/v1/audio/transcriptions', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Erreur serveur : ${res.status} ${res.statusText}`);
+      }
+
+      const text = await res.text();
+      resultEl.value = text.trim();
+      resultBlock.classList.add('visible');
+      statusEl.textContent = 'Transcription terminée.';
+    } catch (err) {
+      statusEl.className = 'status error';
+      statusEl.textContent = err.message;
+    } finally {
+      transcribeBtn.disabled = false;
+    }
+  });
+
+  // Copy
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(resultEl.value);
+    copyBtn.textContent = 'Copié !';
+    setTimeout(() => copyBtn.textContent = 'Copier', 2000);
+  });
+
+  // Download
+  downloadBtn.addEventListener('click', () => {
+    const basename = selectedFile
+      ? selectedFile.name.replace(/\.[^.]+$/, '')
+      : 'transcription';
+    const blob = new Blob([resultEl.value], { type: 'text/plain' });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement('a'), { href: url, download: basename + '.txt' });
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+</script>
+
+</body>
+</html>

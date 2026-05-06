@@ -1,13 +1,19 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.0] - 2026-05-06
 
 ### Ajouté
 - `README_EN.md` — version anglaise du README
 - `runbooks_en/` — traduction anglaise des trois runbooks (install, recording, transcription)
 - `adr_en/` — traduction anglaise des ADRs
-- `ROADMAP.md` — frontend web envisagé
-- `SECURITY.md` — état des CVEs du scan Harbor et décision de ne pas patcher (service local, sévérité Medium/Low uniquement)
+- `ROADMAP.md` — feuille de route (frontend web, intégration LLM)
+- `SECURITY.md` — état des CVEs du scan Harbor et décision de ne pas patcher
+- `frontend/` — interface web (nginx, port 8765) : drag & drop MP3, sélecteur de langue, téléchargement `.txt`
+- Runbooks web UI (FR + EN)
+
+### Modifié
+- `docker-compose.yml` — ajout du service `frontend`, port whisper non exposé à l'extérieur
+- READMEs — démarrage rapide mis à jour avec l'URL web UI, mention de la confidentialité en mémoire
 
 ---
 

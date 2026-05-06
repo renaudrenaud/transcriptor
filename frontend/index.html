@@ -156,9 +156,9 @@
 
   <!-- Drop zone -->
   <div class="drop-zone" id="dropZone">
-    <input type="file" id="fileInput" accept="audio/*,video/*">
+    <input type="file" id="fileInput" accept=".mp3,audio/mpeg">
     <div class="icon">🎙️</div>
-    <div class="label">Glissez un fichier audio ici ou <strong>cliquez pour parcourir</strong></div>
+    <div class="label">Glissez un fichier <strong>MP3</strong> ici ou <strong>cliquez pour parcourir</strong></div>
     <div class="filename" id="filename"></div>
   </div>
 
@@ -232,6 +232,11 @@
   });
 
   function setFile(file) {
+    if (!file.name.toLowerCase().endsWith('.mp3') && file.type !== 'audio/mpeg') {
+      statusEl.className = 'status error';
+      statusEl.textContent = 'Format non supporté — seuls les fichiers MP3 sont acceptés.';
+      return;
+    }
     selectedFile = file;
     filenameEl.textContent = file.name;
     dropZone.classList.add('has-file');
@@ -264,6 +269,9 @@
         body: formData,
       });
 
+      if (res.status === 504) {
+        throw new Error('Délai dépassé — le fichier est trop long pour être traité dans le temps imparti. Contactez l\'administrateur pour augmenter le timeout.');
+      }
       if (!res.ok) {
         throw new Error(`Erreur serveur : ${res.status} ${res.statusText}`);
       }

@@ -17,10 +17,31 @@ Transcriptor exploite la puissance GPU des machines **AMD Strix Halo** (GMKTec E
 
 ```
 Enregistrement audio  →  Transcription (Transcriptor)  →  LLM  →  Compte rendu
-     meeting.mp3              meeting.txt                          compte_rendu.md
+      meeting.mp3              meeting.txt                          compte_rendu.md
 ```
 
 ![Interface web Transcriptor](docs/images/main.png)
+
+## Interface web intégrée
+
+Transcriptor inclut une interface web accessible sur `http://localhost:8765` qui permet de transcrire et de générer des comptes rendus en quelques clics.
+
+### Transcription
+
+- **Glisser-déposer** de fichiers MP3
+- **Choix de la langue** de l'audio (français, anglais, auto-détection)
+- **Copier** le texte ou le **télécharger** en `.txt`
+
+### Génération de compte rendu (Ollama)
+
+Après transcription, soumettez le texte à un LLM local via Ollama pour produire automatiquement un document structuré :
+
+- **Résumé** — version courte avec points clés, décisions et actions
+- **Compte rendu** — synthèse structurée par sujet
+- **Procès-verbal** — retranscription fidèle et exhaustive
+- **Libre** — prompt personnalisé
+
+La réponse est affichée en **streaming temps réel** et peut être copiée ou téléchargée en `.md`. L'interface est disponible en **français et en anglais**.
 
 ## Démarrage rapide
 
@@ -50,6 +71,12 @@ Sur les machines équipées d'un **AMD AI 395 (Strix Halo)** — comme le GMKTec
 transcriptor/
 ├── docker-compose.yml
 ├── transcribe.sh
+├── frontend/
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── config.json
+│   ├── prompts.json
+│   └── nginx.conf
 ├── adr/
 │   ├── 001-whisper-cpp.md
 │   ├── 002-vulkan-backend.md

@@ -20,6 +20,27 @@ Audio recording  →  Transcription (Transcriptor)  →  LLM  →  Meeting notes
 
 ![Transcriptor web interface](docs/images/main.png)
 
+## Built-in web interface
+
+Transcriptor includes a web interface accessible at `http://localhost:8765` that lets you transcribe and generate reports in a few clicks.
+
+### Transcription
+
+- **Drag-and-drop** MP3 files
+- **Audio language** selection (French, English, auto-detect)
+- **Copy** the text or **download** it as `.txt`
+
+### Report generation (Ollama)
+
+After transcription, submit the text to a local LLM via Ollama to automatically generate a structured document :
+
+- **Summary** — short version with key points, decisions and action items
+- **Report** — structured synthesis by topic
+- **Minutes** — faithful and exhaustive transcription
+- **Free** — custom prompt
+
+The response is displayed in **real-time streaming** and can be copied or downloaded as `.md`. The interface is available in **French and English**.
+
 ## Quick start
 
 ```bash
@@ -54,6 +75,12 @@ On machines equipped with an **AMD AI 395 (Strix Halo)** — such as the GMKTec 
 transcriptor/
 ├── docker-compose.yml
 ├── transcribe.sh
+├── frontend/
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── config.json
+│   ├── prompts.json
+│   └── nginx.conf
 ├── adr/
 │   ├── 001-whisper-cpp.md
 │   ├── 002-vulkan-backend.md

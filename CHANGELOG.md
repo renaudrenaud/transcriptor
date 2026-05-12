@@ -13,6 +13,8 @@
 
 ### Modifié
 - `frontend/nginx.conf` — ajout de la règle de cache
+- `README.md` / `README_EN.md` — documentation de l'interface web intégrée : transcription, génération de compte rendu via Ollama, types de rapport, streaming, téléchargement `.md`
+- `README.md` / `README_EN.md` — arborescence mise à jour avec le dossier `frontend/`
 
 ---
 

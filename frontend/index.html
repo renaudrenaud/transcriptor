@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transcriptor</title>
+  <title>Transcriptor — Transcription & rapport</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -171,7 +171,14 @@
       line-height: 1.6;
     }
 
-    .ollama-info { font-size: .75rem; color: #bbb; text-align: right; }
+    .ollama-host-link {
+      font-family: 'Courier New', monospace;
+      font-size: .75rem;
+      color: #888;
+      text-decoration: none;
+      border-bottom: 1px dotted #ccc;
+    }
+    .ollama-host-link:hover { color: #4f6ef7; border-color: #4f6ef7; }
   </style>
 </head>
 <body>
@@ -264,7 +271,6 @@
       </div>
     </div>
 
-    <div class="ollama-info" id="ollamaInfo"></div>
   </div>
 
 </div>
@@ -276,7 +282,7 @@
 <script>
   const i18n = {
     fr: {
-      subtitle:         'Transcription audio locale — confidentielle & rapide',
+      subtitle:         'Transcription · Génération de rapport · <a class="ollama-host-link" id="ollamaHostLink" href="#" target="_blank" rel="noopener"></a>',
       dropLabel:        'Glissez un fichier <strong>MP3</strong> ici ou <strong>cliquez pour parcourir</strong>',
       langLabel:        'Langue audio',
       optFr:            'Français',
@@ -296,7 +302,8 @@
       typeFree:         'Libre',
       promptLabel:      'Prompt',
       promptPlaceholder:'Saisissez votre prompt… Utilisez {{transcription}} pour insérer le texte.',
-      modelLabel:       'Modèle Ollama',
+      modelLabel:       'Modèles Ollama',
+      modelFrom:        'depuis',
       modelLoading:     'Chargement des modèles…',
       modelError:       'Impossible de contacter Ollama',
       generate:         'Générer',
@@ -311,7 +318,7 @@
       errOllama:        'Impossible de contacter Ollama. Vérifiez l\'URL dans config.json et que CORS est activé (OLLAMA_ORIGINS=*).',
     },
     en: {
-      subtitle:         'Local audio transcription — private & fast',
+      subtitle:         'Transcription · Report generation · <a class="ollama-host-link" id="ollamaHostLink" href="#" target="_blank" rel="noopener"></a>',
       dropLabel:        'Drop an <strong>MP3</strong> file here or <strong>click to browse</strong>',
       langLabel:        'Audio language',
       optFr:            'French',
@@ -331,7 +338,8 @@
       typeFree:         'Free',
       promptLabel:      'Prompt',
       promptPlaceholder:'Enter your prompt… Use {{transcription}} to insert the text.',
-      modelLabel:       'Ollama model',
+      modelLabel:       'Ollama models',
+      modelFrom:        'from',
       modelLoading:     'Loading models…',
       modelError:       'Unable to reach Ollama',
       generate:         'Generate',
@@ -359,12 +367,22 @@
     fetch('/VERSION').then(r => r.ok ? r.text() : null).catch(() => null),
   ]).then(([cfg, prs, ver]) => {
     if (cfg.ollamaHost) ollamaHost = cfg.ollamaHost.replace(/\/$/, '');
-    document.getElementById('ollamaInfo').textContent = ollamaHost;
+    setOllamaHostUI();
     prompts = prs;
     if (ver) document.getElementById('version').textContent = 'v' + ver.trim();
     // Set default prompt (pv)
     setReportType(document.getElementById('reportType').value);
   });
+
+  function setOllamaHostUI() {
+    const link = document.getElementById('ollamaHostLink');
+    if (link) { link.href = ollamaHost; link.textContent = ollamaHost; }
+    const modelLabelEl = document.getElementById('modelLabel');
+    if (modelLabelEl) {
+      const t = i18n[locale];
+      modelLabelEl.textContent = `${t.modelLabel} (${t.modelFrom} ${ollamaHost})`;
+    }
+  }
 
   function setLang(l) {
     locale = l;
@@ -390,10 +408,11 @@
     document.getElementById('typeFree').textContent       = t.typeFree;
     document.getElementById('promptLabel').textContent    = t.promptLabel;
     document.getElementById('promptArea').placeholder     = t.promptPlaceholder;
-    document.getElementById('modelLabel').textContent     = t.modelLabel;
+
     document.getElementById('generateBtn').textContent    = t.generate;
     document.getElementById('copyReportBtn').textContent  = t.copyReport;
     document.getElementById('downloadMdBtn').textContent  = t.downloadMd;
+    setOllamaHostUI();
     // Reload prompt in new language (except free — user-written)
     const currentType = document.getElementById('reportType').value;
     if (currentType !== 'free') setReportType(currentType);

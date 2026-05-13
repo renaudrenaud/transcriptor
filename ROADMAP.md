@@ -22,7 +22,7 @@ Interface de transcription partagée, accessible depuis n'importe quelle machine
 ### Contexte
 
 - Ollama tourne sur le host (`http://localhost:11434`) — pas dans Docker
-- Modèle : `gpt-oos:20b`
+- Modèle : `gpt-oss:20b`
 - Depuis les containers Docker, Ollama est accessible via `host.docker.internal:11434`
 
 ### Principe

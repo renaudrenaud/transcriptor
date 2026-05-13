@@ -41,6 +41,8 @@ After transcription, submit the text to a local LLM via Ollama to automatically 
 
 The response is displayed in **real-time streaming** and can be copied or downloaded as `.md`. The interface is available in **French and English**.
 
+Models that have delivered good results: `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`.
+
 ## Quick start
 
 ```bash

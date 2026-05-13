@@ -4,7 +4,12 @@
 
 Transformez vos enregistrements audio en texte, **localement**, **rapidement**, **en toute confidentialité**.
 
-Transcriptor exploite la puissance GPU des machines **AMD Strix Halo** (GMKTec EVO2, Asus ROG Flow Z13 2025…) pour transcrire une heure d'enregistrement en moins de deux minutes — sans envoyer une seule donnée dans le cloud. Le texte produit peut ensuite être soumis à un LLM pour générer un compte rendu, extraire des décisions, ou produire tout autre document structuré.
+- Transcriptor exploite la puissance GPU des machines **AMD Strix Halo** (GMKTec EVO2, Asus ROG Flow Z13 2025…) 
+- pour transcrire par exemple une heure d'enregistrement audio MP3 en moins de deux minutes 
+- sans envoyer une seule donnée dans le cloud !
+- Le texte produit peut ensuite être soumis à 
+    - une interfce web intégrée qui appelle Ollama (local ou distant) pour la génératin du compte rendu en toute confidentialié. 
+    - un LLM externe quelconque via copier-coller, dans ce cas la confidentialité n'est plus garantie ! 
 
 ## Pourquoi Transcriptor ?
 
@@ -42,6 +47,8 @@ Après transcription, soumettez le texte à un LLM local via Ollama pour produir
 - **Libre** — prompt personnalisé
 
 La réponse est affichée en **streaming temps réel** et peut être copiée ou téléchargée en `.md`. L'interface est disponible en **français et en anglais**.
+
+Modèles ayant donné de bons résultats : `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`.
 
 ## Démarrage rapide
 

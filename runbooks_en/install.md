@@ -204,6 +204,16 @@ ports:
   - "8181:8080"
 ```
 
+### `permission denied` on `/var/run/docker.sock`
+
+The current user is not in the `docker` group:
+
+```bash
+sudo usermod -aG docker $USER
+# Log out and back in — mandatory, or for the current session:
+newgrp docker
+```
+
 ### Harbor authentication fails
 
-Check that your credentials are correct and that your account has `pull` rights on the Harbor project.
+Check that your account has `pull` rights on the Harbor project.

@@ -96,52 +96,66 @@ docker compose logs whisper | grep -i vulkan
 
 > **Accès restreint.** Cette voie est réservée aux personnes disposant de credentials pour notre registre Harbor interne. Si vous n'avez pas de compte Harbor, utilisez la [Voie A](#voie-a--git-clone-source-publique).
 
-Harbor fournit des images auditées et scannées (voir `SECURITY.md`), hébergées sur notre réseau interne. Avantage principal sur le réseau local : pas de dépendance à `ghcr.io`.
+Harbor héberge les deux images de l'application (`whisper` et `frontend`), auditées et scannées. Aucun git clone requis — tout vient du registre.
 
-### Étape 1 — Cloner le projet
-
-```bash
-git clone <url-du-repo> transcriptor
-cd transcriptor
-```
-
-### Étape 2 — Configurer les credentials Harbor
-
-Copier le fichier d'environnement et renseigner les valeurs :
+### Étape 1 — Se connecter au registre Harbor
 
 ```bash
-cp .env.example .env
-# Éditer .env : renseigner PROD_HARBOR_URL, PROD_HARBOR_USER, PROD_HARBOR_PASSWORD, PROD_HARBOR_PROJECT
+docker login harbor-prod.atlog.io \
+  --username <votre-login>
 ```
 
-### Étape 3 — Se connecter au registre Harbor
+### Étape 2 — Créer le répertoire de travail
 
 ```bash
-source .env
-docker login "${PROD_HARBOR_URL}" \
-  --username "${PROD_HARBOR_USER}" \
-  --password "${PROD_HARBOR_PASSWORD}"
+mkdir transcriptor && cd transcriptor
 ```
 
-### Étape 4 — Remplacer l'image dans le Compose
-
-Créer un fichier `docker-compose.override.yml` à la racine du projet :
+### Étape 3 — Créer le fichier `docker-compose.yml`
 
 ```yaml
 services:
   whisper:
-    image: ${PROD_HARBOR_URL#https://}/${PROD_HARBOR_PROJECT}/whisper-server-vulkan:<VERSION>
+    image: harbor-prod.atlog.io/ia_tools/whisper-server-vulkan:1.4.0
+    init: true
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    read_only: true
+    tmpfs:
+      - /root/.cache/mesa_shader_cache
+    volumes:
+      - ~/models:/models:ro
+    restart: unless-stopped
+
+  frontend:
+    image: harbor-prod.atlog.io/ia_tools/frontend:1.4.0
+    ports:
+      - "8765:80"
+    volumes:
+      - ./config.json:/usr/share/nginx/html/config.json:ro
+    depends_on:
+      - whisper
+    restart: unless-stopped
 ```
 
-Remplacer `<VERSION>` par la version cible (ex. `1.3.0`). Les versions disponibles sont listées dans le registre Harbor.
+### Étape 4 — Créer le fichier `config.json`
+
+Ce fichier indique l'adresse du serveur Ollama utilisé pour la génération de compte rendu :
+
+```json
+{
+  "ollamaHost": "http://localhost:11434"
+}
+```
+
+Remplacer `localhost` par le nom ou l'IP de la machine Ollama si elle est distante (ex. `http://evo-x2:11434`).
 
 ### Étape 5 — Démarrer
 
 ```bash
 docker compose up -d
 ```
-
-Docker Compose fusionne automatiquement `docker-compose.yml` et `docker-compose.override.yml`. L'image provient alors de Harbor plutôt que de `ghcr.io`.
 
 ### Étape 6 — Vérifier que Vulkan est actif
 
@@ -152,6 +166,10 @@ docker compose logs whisper | grep -i vulkan
 ### Étape 7 — Tester
 
 ```bash
+# Interface web
+open http://localhost:8765
+
+# CLI (nécessite d'avoir transcribe.sh — récupérable depuis le repo git)
 ./transcribe.sh ~/Téléchargements/meeting.mp3
 ```
 

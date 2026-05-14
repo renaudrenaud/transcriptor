@@ -5,26 +5,29 @@ set -euo pipefail
 set -a; source .env; set +a
 
 VERSION=$(cat VERSION)
-SOURCE_IMAGE="ghcr.io/kth8/whisper-server-vulkan:${WHISPER_IMAGE_TAG:-latest}"
-TARGET_IMAGE="${TEST_HARBOR_URL#https://}/${TEST_HARBOR_PROJECT}/whisper-server-vulkan:${VERSION}"
-
-echo "Source  : ${SOURCE_IMAGE}"
-echo "Cible   : ${TARGET_IMAGE}"
-echo ""
+HARBOR="${TEST_HARBOR_URL#https://}/${TEST_HARBOR_PROJECT}"
+WHISPER_SOURCE="ghcr.io/kth8/whisper-server-vulkan:${WHISPER_IMAGE_TAG:-latest}"
+WHISPER_TARGET="${HARBOR}/whisper-server-vulkan:${VERSION}"
+FRONTEND_TARGET="${HARBOR}/frontend:${VERSION}"
 
 echo "→ Login Harbor test..."
 echo "${TEST_HARBOR_PASSWORD}" | docker login "${TEST_HARBOR_URL}" \
   --username "${TEST_HARBOR_USER}" \
   --password-stdin
 
-echo "→ Pull de l'image source..."
-docker pull "${SOURCE_IMAGE}"
-
-echo "→ Tag..."
-docker tag "${SOURCE_IMAGE}" "${TARGET_IMAGE}"
-
-echo "→ Push vers Harbor test..."
-docker push "${TARGET_IMAGE}"
+echo ""
+echo "── whisper ──────────────────────────────"
+echo "Source  : ${WHISPER_SOURCE}"
+echo "Cible   : ${WHISPER_TARGET}"
+docker pull "${WHISPER_SOURCE}"
+docker tag  "${WHISPER_SOURCE}" "${WHISPER_TARGET}"
+docker push "${WHISPER_TARGET}"
+echo "Publié  : ${WHISPER_TARGET}"
 
 echo ""
-echo "Publié : ${TARGET_IMAGE}"
+echo "── frontend ─────────────────────────────"
+echo "Source  : frontend:${VERSION} (local)"
+echo "Cible   : ${FRONTEND_TARGET}"
+docker tag  "frontend:${VERSION}" "${FRONTEND_TARGET}"
+docker push "${FRONTEND_TARGET}"
+echo "Publié  : ${FRONTEND_TARGET}"

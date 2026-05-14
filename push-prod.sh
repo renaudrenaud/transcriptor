@@ -5,14 +5,17 @@ set -euo pipefail
 set -a; source .env; set +a
 
 VERSION=$(cat VERSION)
-SOURCE_IMAGE="ghcr.io/kth8/whisper-server-vulkan:${WHISPER_IMAGE_TAG:-latest}"
-TARGET_IMAGE="${PROD_HARBOR_URL#https://}/${PROD_HARBOR_PROJECT}/whisper-server-vulkan:${VERSION}"
+HARBOR="${PROD_HARBOR_URL#https://}/${PROD_HARBOR_PROJECT}"
+WHISPER_SOURCE="ghcr.io/kth8/whisper-server-vulkan:${WHISPER_IMAGE_TAG:-latest}"
+WHISPER_TARGET="${HARBOR}/whisper-server-vulkan:${VERSION}"
+FRONTEND_TARGET="${HARBOR}/frontend:${VERSION}"
 
-echo "Source  : ${SOURCE_IMAGE}"
-echo "Cible   : ${TARGET_IMAGE}"
+echo "Images à publier en PROD (v${VERSION}) :"
+echo "  whisper  : ${WHISPER_TARGET}"
+echo "  frontend : ${FRONTEND_TARGET}"
 echo ""
 
-read -rp "Pousser en PROD la version ${VERSION} ? [oui/NON] " confirm
+read -rp "Confirmer ? [oui/NON] " confirm
 [[ "${confirm}" == "oui" ]] || { echo "Annulé."; exit 0; }
 
 echo "→ Login Harbor prod..."
@@ -20,14 +23,15 @@ echo "${PROD_HARBOR_PASSWORD}" | docker login "${PROD_HARBOR_URL}" \
   --username "${PROD_HARBOR_USER}" \
   --password-stdin
 
-echo "→ Pull de l'image source..."
-docker pull "${SOURCE_IMAGE}"
-
-echo "→ Tag..."
-docker tag "${SOURCE_IMAGE}" "${TARGET_IMAGE}"
-
-echo "→ Push vers Harbor prod..."
-docker push "${TARGET_IMAGE}"
+echo ""
+echo "── whisper ──────────────────────────────"
+docker pull "${WHISPER_SOURCE}"
+docker tag  "${WHISPER_SOURCE}" "${WHISPER_TARGET}"
+docker push "${WHISPER_TARGET}"
+echo "Publié  : ${WHISPER_TARGET}"
 
 echo ""
-echo "Publié : ${TARGET_IMAGE}"
+echo "── frontend ─────────────────────────────"
+docker tag  "frontend:${VERSION}" "${FRONTEND_TARGET}"
+docker push "${FRONTEND_TARGET}"
+echo "Publié  : ${FRONTEND_TARGET}"

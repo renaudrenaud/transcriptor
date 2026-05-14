@@ -1,17 +1,21 @@
 # Changelog
 
-## [1.4.0] - 2026-05-14
+## [1.4.0] - 2026-05-15
 
 ### Ajouté
 - Affichage de l'URL Ollama dans l'interface web — visible dans le sous-titre et dans le label du sélecteur de modèles (ex. `Modèles Ollama (depuis http://evo-x2:11434)`)
 - Image Docker `frontend` publiée dans Harbor (test + prod) — installation Harbor désormais autonome, sans git clone
 - `push-test.sh` / `push-prod.sh` — publient désormais les deux images (`whisper` + `frontend`)
 - Runbook install FR + EN restructuré en deux voies : **A** (git clone, source publique) et **B** (Harbor, registre privé, sans git clone)
+- ADR-004 (FR + EN) : décision container frontend séparé (nginx)
 
 ### Modifié
-- `README.md` / `README_EN.md` — recommandations de modèles Ollama : `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`
+- `README.md` / `README_EN.md` — section Architecture (deux containers), recommandations de modèles Ollama : `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`
 - `frontend/config.json` — `ollamaHost` pointé sur `http://evo-x2:11434`
 - `ROADMAP.md` — correction typographique `gpt-oos` → `gpt-oss`
+
+### Sécurité
+- Rebuild de l'image `frontend` sur `nginx:alpine` mis à jour — corrige CVE-2026-27135 (nghttp2-libs, Haut), CVE-2026-4367 (libxpm, Moyen), CVE-2026-34743 (xz-libs, Moyen). Validé via scan Harbor local avant push test/prod.
 
 ---
 

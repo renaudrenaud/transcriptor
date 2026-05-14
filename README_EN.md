@@ -54,6 +54,21 @@ docker compose up -d
 
 See the [runbooks](#runbooks) for full installation and advanced options.
 
+## Architecture
+
+Transcriptor runs as **two containers**:
+
+| Container | Role |
+|-----------|------|
+| `whisper` | Transcription server (whisper.cpp + Vulkan). Exposes an internal HTTP API. |
+| `frontend` | Nginx: serves the web interface and proxies API calls to `whisper`. |
+
+The `frontend` container is optional if you only use the CLI (`./transcribe.sh`). In that case, one container is enough:
+
+```bash
+docker compose up -d whisper
+```
+
 ## Performance
 
 On machines equipped with an **AMD AI 395 (Strix Halo)** — such as the GMKTec EVO2 or Asus ROG Flow Z13 2025 — one hour of MP3 audio is transcribed in approximately **2 minutes**.
@@ -70,6 +85,7 @@ On machines equipped with an **AMD AI 395 (Strix Halo)** — such as the GMKTec 
 - [ADR-001 — Use of whisper.cpp](adr_en/001-whisper-cpp.md)
 - [ADR-002 — GPU Backend: Vulkan](adr_en/002-vulkan-backend.md)
 - [ADR-003 — Pre-built image instead of build from source](adr_en/003-prebuilt-image.md)
+- [ADR-004 — Separate frontend container (nginx)](adr_en/004-frontend-container.md)
 
 ## Structure
 
@@ -86,13 +102,16 @@ transcriptor/
 ├── adr/
 │   ├── 001-whisper-cpp.md
 │   ├── 002-vulkan-backend.md
-│   └── 003-image-pre-compilee.md
+│   ├── 003-image-pre-compilee.md
+│   └── 004-frontend-container.md
 ├── adr_en/
 │   ├── 001-whisper-cpp.md
 │   ├── 002-vulkan-backend.md
-│   └── 003-prebuilt-image.md
+│   ├── 003-prebuilt-image.md
+│   └── 004-frontend-container.md
 ├── runbooks/
 │   ├── install.md
+│   ├── webui.md
 │   ├── enregistrement.md
 │   └── transcription.md
 └── runbooks_en/

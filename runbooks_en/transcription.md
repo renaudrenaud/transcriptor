@@ -2,10 +2,10 @@
 
 ## Prerequisites
 
-The whisper server must be running:
+The whisper server must be running. The `frontend` container is not needed for CLI use:
 
 ```bash
-docker compose up -d
+docker compose up -d whisper
 ```
 
 ## Transcribe a file

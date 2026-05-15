@@ -32,9 +32,30 @@ http://localhost:8765
 4. Wait — approximately 2 minutes per hour of audio
 5. Copy the text or download as `.txt`
 
+## Report generation (Ollama)
+
+After transcription, the text can be submitted to Ollama — running locally on the same Strix Halo machine, accelerated by the AMD GPU — to produce a structured document.
+
+1. Select the report type from the dropdown
+2. Choose the Ollama model
+3. Click **Generate**
+4. The response is displayed in real-time streaming
+5. Copy the result or download it as `.md`
+
+![Report type selection](../docs/images/ReportType.png)
+
+Available types:
+
+- **Summary** — short version with key points, decisions and action items
+- **Report** — structured synthesis by topic
+- **Minutes** — faithful and exhaustive transcription
+- **Free** — custom prompt
+
+Models that have delivered good results: `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`.
+
 ## Privacy
 
-The audio file is processed in memory inside the whisper container. No trace remains server-side after transcription — neither the audio file nor the text.
+The audio file is processed in memory inside the whisper container. No trace remains server-side after transcription — neither the audio file nor the text. Report generation via Ollama is also local: no data leaves the machine.
 
 ## Ollama connectivity and CORS
 

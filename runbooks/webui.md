@@ -32,9 +32,30 @@ http://localhost:8765
 4. Patienter — environ 2 minutes pour 1h d'audio
 5. Copier le texte ou télécharger en `.txt`
 
+## Génération de compte rendu (Ollama)
+
+Après transcription, le texte peut être soumis à Ollama — qui tourne localement sur la même machine Strix Halo, accéléré par le GPU AMD — pour produire un document structuré.
+
+1. Sélectionner le type de rapport dans la liste déroulante
+2. Choisir le modèle Ollama
+3. Cliquer **Generate**
+4. La réponse s'affiche en streaming temps réel
+5. Copier le résultat ou le télécharger en `.md`
+
+![Sélection du type de rapport](../docs/images/ReportType.png)
+
+Types disponibles :
+
+- **Résumé** — version courte avec points clés, décisions et actions
+- **Compte rendu** — synthèse structurée par sujet
+- **Procès-verbal** — retranscription fidèle et exhaustive
+- **Libre** — prompt personnalisé
+
+Modèles ayant donné de bons résultats : `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`.
+
 ## Confidentialité
 
-Le fichier audio est traité en mémoire dans le container whisper. Aucune trace ne reste côté serveur après la transcription — ni le fichier audio, ni le texte.
+Le fichier audio est traité en mémoire dans le container whisper. Aucune trace ne reste côté serveur après la transcription — ni le fichier audio, ni le texte. La génération de compte rendu via Ollama est également locale : aucune donnée ne quitte la machine.
 
 ## Connexion Ollama et CORS
 

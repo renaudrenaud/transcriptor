@@ -4,12 +4,12 @@
 
 Transformez vos enregistrements audio en texte, **localement**, **rapidement**, **en toute confidentialité**.
 
-- Transcriptor exploite la puissance GPU des machines **AMD Strix Halo** (GMKTec EVO2, Asus ROG Flow Z13 2025…) 
-- pour transcrire par exemple une heure d'enregistrement audio MP3 en moins de deux minutes 
-- sans envoyer une seule donnée dans le cloud !
-- Le texte produit peut ensuite être soumis à 
-    - une interfce web intégrée qui appelle Ollama (local ou distant) pour la génératin du compte rendu en toute confidentialié. 
-    - un LLM externe quelconque via copier-coller, dans ce cas la confidentialité n'est plus garantie ! 
+Transcriptor exploite la puissance GPU des machines **AMD Strix Halo** (GMKTec EVO2, Asus ROG Flow Z13 2025…) pour deux tâches qui restent entièrement locales :
+
+- **Transcription** : une heure d'audio MP3 en moins de deux minutes via whisper.cpp (GPU AMD, Vulkan).
+- **Génération de compte rendu** : Ollama tourne sur la même machine, accéléré par le même GPU, pour produire le document structuré sans quitter le réseau local.
+
+Aucune donnée n'est envoyée dans le cloud. Le texte peut aussi être soumis à un LLM externe via copier-coller, mais dans ce cas la confidentialité n'est plus garantie.
 
 ## Pourquoi Transcriptor ?
 
@@ -39,12 +39,14 @@ Transcriptor inclut une interface web accessible sur `http://localhost:8765` qui
 
 ### Génération de compte rendu (Ollama)
 
-Après transcription, soumettez le texte à un LLM local via Ollama pour produire automatiquement un document structuré :
+Après transcription, soumettez le texte à Ollama — qui tourne localement sur la même machine Strix Halo, accéléré par le GPU AMD — pour produire automatiquement un document structuré :
 
 - **Résumé** — version courte avec points clés, décisions et actions
 - **Compte rendu** — synthèse structurée par sujet
 - **Procès-verbal** — retranscription fidèle et exhaustive
 - **Libre** — prompt personnalisé
+
+![Sélection du type de rapport](docs/images/ReportType.png)
 
 La réponse est affichée en **streaming temps réel** et peut être copiée ou téléchargée en `.md`. L'interface est disponible en **français et en anglais**.
 

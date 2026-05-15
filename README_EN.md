@@ -2,7 +2,12 @@
 
 Turn your audio recordings into text — **locally**, **fast**, **with full privacy**.
 
-Transcriptor leverages the GPU power of **AMD Strix Halo** machines (GMKTec EVO2, Asus ROG Flow Z13 2025…) to transcribe an hour of audio in under two minutes — without sending a single byte to the cloud. The resulting text can then be fed into an LLM to generate meeting notes, extract decisions, or produce any structured document.
+Transcriptor leverages the GPU power of **AMD Strix Halo** machines (GMKTec EVO2, Asus ROG Flow Z13 2025…) for two tasks that stay entirely local:
+
+- **Transcription**: one hour of MP3 audio in under two minutes via whisper.cpp (AMD GPU, Vulkan).
+- **Report generation**: Ollama runs on the same machine, accelerated by the same GPU, to produce a structured document without leaving the local network.
+
+No data is sent to the cloud. The text can also be pasted into an external LLM, but privacy is no longer guaranteed in that case.
 
 ## Why Transcriptor?
 
@@ -32,12 +37,14 @@ Transcriptor includes a web interface accessible at `http://localhost:8765` that
 
 ### Report generation (Ollama)
 
-After transcription, submit the text to a local LLM via Ollama to automatically generate a structured document :
+After transcription, submit the text to Ollama — running locally on the same Strix Halo machine, accelerated by the AMD GPU — to automatically generate a structured document:
 
 - **Summary** — short version with key points, decisions and action items
 - **Report** — structured synthesis by topic
 - **Minutes** — faithful and exhaustive transcription
 - **Free** — custom prompt
+
+![Report type selection](docs/images/ReportType.png)
 
 The response is displayed in **real-time streaming** and can be copied or downloaded as `.md`. The interface is available in **French and English**.
 

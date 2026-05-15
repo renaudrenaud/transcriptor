@@ -36,6 +36,50 @@ http://localhost:8765
 
 Le fichier audio est traité en mémoire dans le container whisper. Aucune trace ne reste côté serveur après la transcription — ni le fichier audio, ni le texte.
 
+## Connexion Ollama et CORS
+
+### Pourquoi le navigateur ne peut pas contacter Ollama directement
+
+La liste des modèles et la génération de rapport s'exécutent en JavaScript **dans le navigateur** — ce n'est pas le serveur nginx qui appelle Ollama, c'est le browser. Le navigateur joint Ollama à l'URL définie dans `frontend/config.json`.
+
+Quand le browser fait un appel vers un port différent (ex. `8765` → `11434`), c'est une requête **cross-origin**. Le navigateur envoie un en-tête `Origin` contenant l'URL de la barre d'adresse. Ollama vérifie si cette origine est autorisée avant de répondre.
+
+Exemple : pour un accès à `http://evo-x2:8765`, le browser envoie `Origin: http://evo-x2:8765` à Ollama sur le port `11434`. Si cette origine n'est pas dans la liste d'Ollama → requête bloquée, modèles invisibles.
+
+### Variable OLLAMA_ORIGINS
+
+Sur le container Ollama, définir la variable d'environnement :
+
+```
+OLLAMA_ORIGINS=http://evo-x2:8765
+```
+
+Plusieurs origines séparées par des virgules :
+
+```
+OLLAMA_ORIGINS=http://evo-x2:8765,http://ma-machine-locale:8765
+```
+
+Wildcard (toutes origines autorisées) :
+
+```
+OLLAMA_ORIGINS=*
+```
+
+### Risques selon la valeur
+
+| Valeur | Sécurité | Usage recommandé |
+|---|---|---|
+| `http://evo-x2:8765` | Élevée — seul ce frontend est autorisé | Serveur exposé sur internet |
+| `http://evo-x2:8765,http://autre:8765` | Élevée — liste explicite | Plusieurs frontends connus |
+| `*` | Faible — n'importe quelle page web peut appeler Ollama | Réseau local privé uniquement |
+
+> **Note :** l'IP du container Docker (`172.17.x.x`) ne sert à rien ici — elle n'apparaît jamais dans la barre d'adresse du navigateur, donc jamais dans l'en-tête `Origin`.
+
+### Vérifier dans la console navigateur
+
+Si les modèles n'apparaissent pas, ouvrir la console (F12) : une erreur `blocked by CORS policy` confirme que `OLLAMA_ORIGINS` est absent ou ne contient pas l'origine courante.
+
 ## Dépannage
 
 ### Page inaccessible

@@ -36,6 +36,50 @@ http://localhost:8765
 
 The audio file is processed in memory inside the whisper container. No trace remains server-side after transcription — neither the audio file nor the text.
 
+## Ollama connectivity and CORS
+
+### Why the browser cannot contact Ollama directly
+
+The model list and report generation run as JavaScript **in the browser** — it is not the nginx server that calls Ollama, it is the browser itself. The browser connects to Ollama at the URL defined in `frontend/config.json`.
+
+When the browser makes a call to a different port (e.g. `8765` → `11434`), this is a **cross-origin** request. The browser sends an `Origin` header containing the URL shown in the address bar. Ollama checks whether that origin is allowed before responding.
+
+Example: when accessing `http://evo-x2:8765`, the browser sends `Origin: http://evo-x2:8765` to Ollama on port `11434`. If that origin is not in Ollama's list → request blocked, no models visible.
+
+### OLLAMA_ORIGINS variable
+
+On the Ollama container, set the environment variable:
+
+```
+OLLAMA_ORIGINS=http://evo-x2:8765
+```
+
+Multiple origins separated by commas:
+
+```
+OLLAMA_ORIGINS=http://evo-x2:8765,http://my-local-machine:8765
+```
+
+Wildcard (all origins allowed):
+
+```
+OLLAMA_ORIGINS=*
+```
+
+### Risk levels by value
+
+| Value | Security | Recommended use |
+|---|---|---|
+| `http://evo-x2:8765` | High — only this frontend is allowed | Server exposed to the internet |
+| `http://evo-x2:8765,http://other:8765` | High — explicit list | Multiple known frontends |
+| `*` | Low — any web page can call Ollama | Private local network only |
+
+> **Note:** the Docker container IP (`172.17.x.x`) is useless here — it never appears in the browser's address bar, so it never appears in the `Origin` header.
+
+### Check in the browser console
+
+If models do not appear, open the console (F12): a `blocked by CORS policy` error confirms that `OLLAMA_ORIGINS` is missing or does not include the current origin.
+
 ## Troubleshooting
 
 ### Page not accessible

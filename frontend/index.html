@@ -179,6 +179,17 @@
       border-bottom: 1px dotted #ccc;
     }
     .ollama-host-link:hover { color: #4f6ef7; border-color: #4f6ef7; }
+
+    .ollama-status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      vertical-align: middle;
+      margin-left: 5px;
+      transition: background .3s;
+    }
   </style>
 </head>
 <body>
@@ -282,7 +293,7 @@
 <script>
   const i18n = {
     fr: {
-      subtitle:         'Transcription · Génération de rapport · <a class="ollama-host-link" id="ollamaHostLink" href="#" target="_blank" rel="noopener"></a>',
+      subtitle:         'Transcription · Génération de rapport · <a class="ollama-host-link" id="ollamaHostLink" href="#" target="_blank" rel="noopener"></a><span class="ollama-status-dot" id="ollamaStatusDot" title="Vérification…"></span>',
       dropLabel:        'Glissez un fichier <strong>MP3</strong> ici ou <strong>cliquez pour parcourir</strong>',
       langLabel:        'Langue audio',
       optFr:            'Français',
@@ -370,8 +381,8 @@
     setOllamaHostUI();
     prompts = prs;
     if (ver) document.getElementById('version').textContent = 'v' + ver.trim();
-    // Set default prompt (pv)
     setReportType(document.getElementById('reportType').value);
+    checkOllamaStatus();
   });
 
   function setOllamaHostUI() {
@@ -444,14 +455,16 @@
 
   setLang(locale);
 
-  // Load Ollama models
-  async function loadModels() {
+  // Check Ollama connectivity + load models
+  async function checkOllamaStatus() {
+    const dot = document.getElementById('ollamaStatusDot');
     const sel = document.getElementById('modelSelect');
-    sel.innerHTML = `<option>${i18n[locale].modelLoading}</option>`;
+    if (dot) { dot.style.background = '#f59e0b'; dot.title = '…'; }
     try {
       const res = await fetch(`${ollamaHost}/api/tags`);
       if (!res.ok) throw new Error();
       const data = await res.json();
+      if (dot) { dot.style.background = '#22c55e'; dot.title = 'Ollama connecté'; }
       sel.innerHTML = '';
       (data.models || []).forEach(m => {
         const opt = document.createElement('option');
@@ -462,6 +475,7 @@
       });
       if (!sel.options.length) throw new Error();
     } catch {
+      if (dot) { dot.style.background = '#ef4444'; dot.title = 'Ollama inaccessible'; }
       sel.innerHTML = `<option disabled>${i18n[locale].modelError}</option>`;
     }
   }
@@ -539,7 +553,7 @@
       reportBlock.classList.remove('visible');
       llmStatus.textContent = '';
       llmStatus.className = 'status';
-      await loadModels();
+      await checkOllamaStatus();
     } catch (err) {
       statusEl.className = 'status error';
       statusEl.textContent = err.message;

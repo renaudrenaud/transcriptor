@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.5.0] - 2026-05-17
 
 ### Ajouté
 - Sélecteur de niveau de raisonnement (thinking) dans l'interface web — cinq niveaux : Désactivé, Faible, Moyen, Élevé, Maximum ; défaut : Faible (`low`)

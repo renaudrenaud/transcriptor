@@ -260,12 +260,22 @@
       <textarea class="prompt-area" id="promptArea" spellcheck="false"></textarea>
     </div>
 
-    <!-- Model + generate -->
+    <!-- Model + thinking + generate -->
     <div class="controls">
       <div class="field" style="flex:1">
         <label for="modelSelect" id="modelLabel"></label>
         <select id="modelSelect">
           <option id="modelLoading"></option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="thinkSelect" id="thinkLabel"></label>
+        <select id="thinkSelect">
+          <option value="off"    id="thinkOff"></option>
+          <option value="low"    id="thinkLow" selected></option>
+          <option value="medium" id="thinkMedium"></option>
+          <option value="high"   id="thinkHigh"></option>
+          <option value="max"    id="thinkMax"></option>
         </select>
       </div>
       <button id="generateBtn" style="flex:none; white-space:nowrap"></button>
@@ -317,6 +327,12 @@
       modelFrom:        'depuis',
       modelLoading:     'Chargement des modèles…',
       modelError:       'Impossible de contacter Ollama',
+      thinkLabel:       'Raisonnement',
+      thinkOff:         'Désactivé',
+      thinkLow:         'Faible',
+      thinkMedium:      'Moyen',
+      thinkHigh:        'Élevé',
+      thinkMax:         'Maximum',
       generate:         'Générer',
       generating:       'Génération en cours…',
       generatedDone:    'Compte rendu généré.',
@@ -353,6 +369,12 @@
       modelFrom:        'from',
       modelLoading:     'Loading models…',
       modelError:       'Unable to reach Ollama',
+      thinkLabel:       'Thinking',
+      thinkOff:         'Off',
+      thinkLow:         'Low',
+      thinkMedium:      'Medium',
+      thinkHigh:        'High',
+      thinkMax:         'Max',
       generate:         'Generate',
       generating:       'Generating…',
       generatedDone:    'Report generated.',
@@ -420,6 +442,12 @@
     document.getElementById('promptLabel').textContent    = t.promptLabel;
     document.getElementById('promptArea').placeholder     = t.promptPlaceholder;
 
+    document.getElementById('thinkLabel').textContent     = t.thinkLabel;
+    document.getElementById('thinkOff').textContent       = t.thinkOff;
+    document.getElementById('thinkLow').textContent       = t.thinkLow;
+    document.getElementById('thinkMedium').textContent    = t.thinkMedium;
+    document.getElementById('thinkHigh').textContent      = t.thinkHigh;
+    document.getElementById('thinkMax').textContent       = t.thinkMax;
     document.getElementById('generateBtn').textContent    = t.generate;
     document.getElementById('copyReportBtn').textContent  = t.copyReport;
     document.getElementById('downloadMdBtn').textContent  = t.downloadMd;
@@ -592,7 +620,7 @@
       const res = await fetch(`${ollamaHost}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt, stream: true }),
+        body: JSON.stringify({ model, prompt, stream: true, think: document.getElementById('thinkSelect').value === 'off' ? false : document.getElementById('thinkSelect').value }),
       });
 
       if (!res.ok) throw new Error(`${i18n[locale].errServer} : ${res.status}`);

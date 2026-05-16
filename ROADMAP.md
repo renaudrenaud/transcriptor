@@ -43,3 +43,11 @@ Transcription  →  Ollama (gpt-oos:20b)  →  Compte rendu
 
 - Prompt système à définir (structure du compte rendu, langue de sortie)
 - Faut-il proposer plusieurs templates (compte rendu, liste de décisions, todo…) ?
+
+---
+
+## ✅ Niveau de thinking par type de rapport (livré)
+
+Sélecteur **Raisonnement** dans l'interface web, à côté du sélecteur de modèle. Cinq niveaux : `off`, `low` (défaut), `medium`, `high`, `max`. Le paramètre `think` est transmis tel quel à l'API Ollama (`/api/generate`).
+
+**Prérequis** : modèle Ollama compatible avec la capacité `thinking` (testé : `qwen3.6:27b`, `gpt-oss:120b`).

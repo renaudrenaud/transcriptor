@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Ajouté
+- Sélecteur de niveau de raisonnement (thinking) dans l'interface web — cinq niveaux : Désactivé, Faible, Moyen, Élevé, Maximum ; défaut : Faible (`low`)
+- Paramètre `think` transmis à l'API Ollama (`/api/generate`) à chaque génération de rapport
+- Libellés bilingues FR/EN pour le nouveau contrôle
+
+> Modèles compatibles testés : `qwen3.6:27b`, `gpt-oss:120b` (capacité `thinking` confirmée).
+
+---
+
 ## [1.4.0] - 2026-05-15
 
 ### Ajouté

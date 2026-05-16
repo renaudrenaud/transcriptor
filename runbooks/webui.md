@@ -38,9 +38,10 @@ Après transcription, le texte peut être soumis à Ollama — qui tourne locale
 
 1. Sélectionner le type de rapport dans la liste déroulante
 2. Choisir le modèle Ollama
-3. Cliquer **Generate**
-4. La réponse s'affiche en streaming temps réel
-5. Copier le résultat ou le télécharger en `.md`
+3. Choisir le niveau de raisonnement
+4. Cliquer **Générer**
+5. La réponse s'affiche en streaming temps réel
+6. Copier le résultat ou le télécharger en `.md`
 
 ![Sélection du type de rapport](../docs/images/ReportType.png)
 
@@ -52,6 +53,20 @@ Types disponibles :
 - **Libre** — prompt personnalisé
 
 Modèles ayant donné de bons résultats : `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`.
+
+### Niveau de raisonnement (Thinking)
+
+Le sélecteur **Raisonnement** contrôle l'effort de réflexion du modèle avant de produire sa réponse. Cinq niveaux disponibles :
+
+| Niveau | Usage conseillé |
+|---|---|
+| Désactivé | Réponse directe, sans réflexion préalable |
+| Faible *(défaut)* | Résumés et rapports courants |
+| Moyen | Rapports plus complexes, ambiguïtés dans la transcription |
+| Élevé | Procès-verbaux, synthèses longues |
+| Maximum | Analyses approfondies, réunions très denses |
+
+Plus le niveau est élevé, plus la génération est lente. Le thinking n'a d'effet que sur les modèles qui supportent cette capacité — testé : `qwen3.6:27b`, `gpt-oss:120b`.
 
 ## Confidentialité
 

@@ -38,9 +38,10 @@ After transcription, the text can be submitted to Ollama — running locally on 
 
 1. Select the report type from the dropdown
 2. Choose the Ollama model
-3. Click **Generate**
-4. The response is displayed in real-time streaming
-5. Copy the result or download it as `.md`
+3. Choose the thinking level
+4. Click **Generate**
+5. The response is displayed in real-time streaming
+6. Copy the result or download it as `.md`
 
 ![Report type selection](../docs/images/ReportType.png)
 
@@ -52,6 +53,20 @@ Available types:
 - **Free** — custom prompt
 
 Models that have delivered good results: `gpt-oss:20b`, `gpt-oss:120b`, `qwen3.6:27b`.
+
+### Thinking level
+
+The **Thinking** selector controls how much reasoning effort the model applies before producing its response. Five levels are available:
+
+| Level | Recommended use |
+|---|---|
+| Off | Direct response, no prior reasoning |
+| Low *(default)* | Summaries and standard reports |
+| Medium | More complex reports, ambiguous transcriptions |
+| High | Minutes, long synthesis documents |
+| Max | In-depth analyses, dense meetings |
+
+Higher levels produce slower generation. Thinking only has an effect on models that support this capability — tested: `qwen3.6:27b`, `gpt-oss:120b`.
 
 ## Privacy
 

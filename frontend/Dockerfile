@@ -1,4 +1,5 @@
 FROM nginx:alpine
+RUN apk upgrade --no-cache
 ARG VERSION=dev
 RUN mkdir -p /var/www/version
 RUN echo -n "${VERSION}" > /var/www/version/VERSION

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1] - 2026-05-17
+
+### Sécurité
+- Rebuild de l'image `frontend` sur `nginx:alpine` + `apk upgrade` — corrige 7 CVEs Moyennes dans `curl`/`libcurl` (CVE-2025-14017, CVE-2025-14524, CVE-2025-14819, CVE-2026-1965, CVE-2026-3783, CVE-2026-3784, CVE-2026-3805). Fix : `8.17.0-r1` → `8.19.0-r0`.
+
+---
+
 ## [1.5.0] - 2026-05-17
 
 ### Ajouté

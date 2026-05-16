@@ -10,6 +10,7 @@ Transcriptor est un service local : le serveur whisper écoute sur `localhost:80
 
 | Date | Image | Sévérité | CVE | Action |
 |------|-------|----------|-----|--------|
+| 2026-05-17 | `frontend:1.5.0` | Moyenne | CVE-2025-14017, CVE-2025-14524, CVE-2025-14819, CVE-2026-1965, CVE-2026-3783, CVE-2026-3784, CVE-2026-3805 (curl/libcurl) | ✅ Corrigé — apk upgrade dans Dockerfile |
 | 2026-05-15 | `frontend:1.4.0` | Haute | CVE-2026-27135 (nghttp2-libs) | ✅ Corrigé — rebuild nginx:alpine |
 | 2026-05-15 | `frontend:1.4.0` | Moyenne | CVE-2026-4367 (libxpm) | ✅ Corrigé — rebuild nginx:alpine |
 | 2026-05-15 | `frontend:1.4.0` | Moyenne | CVE-2026-34743 (xz-libs) | ✅ Corrigé — rebuild nginx:alpine |
@@ -22,12 +23,12 @@ Transcriptor est un service local : le serveur whisper écoute sur `localhost:80
 
 ### `frontend` (nginx:alpine)
 
-Scan du **2026-05-15** — rebuild sur `nginx:alpine` latest :
+Scan du **2026-05-17** — `frontend:1.5.1`, rebuild avec `apk upgrade --no-cache` :
 
 - **Critiques / Hautes** : aucune
-- **Moyennes / Basses** : à re-scanner après le rebuild
+- **Moyennes** : 7 CVEs `curl`/`libcurl` corrigées (`8.17.0-r1` → `8.19.0-r0`)
 
-Les 3 CVEs identifiées lors du scan initial (CVE-2026-27135, CVE-2026-4367, CVE-2026-34743) ont été corrigées en rebuildant l'image sur la dernière version de `nginx:alpine`. Validé via scan Harbor local avant push test/prod.
+`apk upgrade --no-cache` ajouté dans le Dockerfile — garantit que tous les packages Alpine sont à jour à chaque rebuild, sans dépendre du tag `nginx:alpine` seul.
 
 ### `whisper-server-vulkan` (ghcr.io/kth8)
 

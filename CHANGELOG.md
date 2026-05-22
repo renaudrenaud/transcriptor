@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.2] - 2026-05-22
+
+### Corrigé
+- **GPU Vulkan** : ajout du tmpfs `/root/.cache/radv_builtin_shaders` dans `docker-compose.yml` — le driver RADV ne pouvait plus compiler ses shaders built-in après le redémarrage des containers suite à l'upgrade Docker/containerd (2.2.3 → 2.2.4), provoquant des erreurs `failed to encode` / `failed to decode` lors de la transcription.
+- **Upload navigateur** : suppression de `proxy_request_buffering off` dans `nginx.conf` — nginx tamponne désormais le corps de la requête avant de la transmettre à whisper, ce qui évite les erreurs de décodage avec certains clients HTTP.
+- **Header MP3 corrompu** : détection et réparation automatique côté client (JS) d'un header Xing VBR invalide (`frames=0, bytes=0`) avant l'envoi au serveur. Certains enregistreurs produisent ce header mal initialisé ; la libav embarquée dans whisper le rejette alors que ffmpeg le tolère. Un avertissement bilingue informe l'utilisateur (FR : « En-tête MP3 corrompu détecté — corrigé automatiquement avant envoi. » / EN : « Corrupt MP3 header detected — repaired automatically before sending. »).
+
+---
+
 ## [1.5.1] - 2026-05-17
 
 ### Sécurité

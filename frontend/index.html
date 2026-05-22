@@ -116,6 +116,7 @@
 
     .status { font-size: .9rem; color: #555; min-height: 1.2rem; text-align: center; }
     .status.error { color: #dc2626; }
+    .status.warn  { color: #d97706; }
 
     .result-block { display: none; flex-direction: column; gap: .75rem; }
     .result-block.visible { display: flex; }
@@ -343,6 +344,7 @@
       errTimeout:       'Délai dépassé — le fichier est trop long. Contactez l\'administrateur pour augmenter le timeout.',
       errServer:        'Erreur serveur',
       errOllama:        'Impossible de contacter Ollama. Vérifiez l\'URL dans config.json et que CORS est activé (OLLAMA_ORIGINS=*).',
+      warnXingHeader:   'En-tête MP3 corrompu détecté — corrigé automatiquement avant envoi.',
     },
     en: {
       subtitle:         'Transcription · Report generation · <a class="ollama-host-link" id="ollamaHostLink" href="#" target="_blank" rel="noopener"></a>',
@@ -385,6 +387,7 @@
       errTimeout:       'Request timed out — file too long. Ask your administrator to increase the timeout.',
       errServer:        'Server error',
       errOllama:        'Unable to reach Ollama. Check the URL in config.json and that CORS is enabled (OLLAMA_ORIGINS=*).',
+      warnXingHeader:   'Corrupt MP3 header detected — repaired automatically before sending.',
     }
   };
 
@@ -553,6 +556,35 @@
     llmBlock.classList.remove('visible');
   }
 
+  // Repair MP3 files with a Xing header where frames=0 and bytes=0.
+  // Some recorders write this invalid header, which whisper's libav rejects.
+  async function repairXingHeader(file) {
+    const buf = await file.arrayBuffer();
+    const view = new DataView(buf);
+    const bytes = new Uint8Array(buf);
+    // Scan the first 8 KB for the Xing marker
+    const limit = Math.min(bytes.length - 16, 8192);
+    for (let i = 0; i < limit; i++) {
+      if (bytes[i] === 0x58 && bytes[i+1] === 0x69 && bytes[i+2] === 0x6E && bytes[i+3] === 0x67) {
+        const flags  = view.getUint32(i + 4, false);
+        const frames = (flags & 1) ? view.getUint32(i + 8, false) : 1;
+        const size   = (flags & 2) ? view.getUint32(i + 12, false) : 1;
+        if (frames === 0 || size === 0) {
+          // Replace Xing with Info (signals CBR, tolerated by all libav versions)
+          bytes[i] = 0x49; bytes[i+1] = 0x6E; bytes[i+2] = 0x66; bytes[i+3] = 0x6F;
+          // Set flags to declare frames + bytes fields present
+          view.setUint32(i + 4, 0x00000003, false);
+          // Write placeholder counts so libav doesn't compute from zeros
+          view.setUint32(i + 8,  0xFFFFFFFF, false);
+          view.setUint32(i + 12, 0xFFFFFFFF, false);
+          return { blob: new Blob([buf], { type: 'audio/mpeg' }), repaired: true };
+        }
+        break;
+      }
+    }
+    return { blob: file, repaired: false };
+  }
+
   // Transcription
   transcribeBtn.addEventListener('click', async () => {
     if (!selectedFile) return;
@@ -562,8 +594,17 @@
     resultBlock.classList.remove('visible');
     llmBlock.classList.remove('visible');
 
+    const { blob: fileToSend, repaired } = await repairXingHeader(selectedFile);
+    if (repaired) {
+      statusEl.className = 'status warn';
+      statusEl.textContent = i18n[locale].warnXingHeader;
+      await new Promise(r => setTimeout(r, 2500));
+      statusEl.className = 'status';
+      statusEl.textContent = i18n[locale].inProgress;
+    }
+
     const formData = new FormData();
-    formData.append('file', selectedFile, selectedFile.name);
+    formData.append('file', fileToSend, selectedFile.name);
     formData.append('model', 'whisper-1');
     formData.append('response_format', 'text');
     const lang = audioLangSel.value;
